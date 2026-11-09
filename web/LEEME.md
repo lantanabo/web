@@ -49,6 +49,6 @@ El formulario de contacto también se envía como mensaje de WhatsApp (no requie
 
 ## Antes de publicar
 
-- Reemplazar `https://www.lantanacafebistro.com/` por el dominio real en `index.html` (canonical, og:url, og:image, JSON-LD), `robots.txt` y `sitemap.xml`.
+- Al comprar un dominio, reemplazar `https://lantanabo.github.io/web/` por el dominio real en `index.html` (canonical, og:url, og:image, JSON-LD), `robots.txt` y `sitemap.xml`.
 - Confirmar usuarios de Instagram y TikTok (en `js/data.js` y en el JSON-LD `sameAs` de `index.html`).
 - Registrar el negocio en Google Business Profile (zona de servicio: Santa Cruz de la Sierra) para potenciar las búsquedas locales.
