@@ -20,8 +20,8 @@ window.LANTANA = {
   whatsappDisplay: "+591 68023040",
 
   // TODO: confirmar los usuarios reales de Instagram y TikTok
-  instagram: "https://www.instagram.com/lantanacafebistro/",
-  tiktok: "https://www.tiktok.com/@lantanacafebistro",
+  instagram: "https://www.instagram.com/lantana.cafebistro/",
+  tiktok: "https://www.tiktok.com/@lantana.cafebistr",
 
   zones: ["Zona Norte", "Zona Centro"],
 
