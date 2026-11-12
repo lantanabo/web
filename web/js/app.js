@@ -150,7 +150,6 @@
           </select>
         </div>`
       : "";
-    const ctaText = p.message || `Hola Lantana Café Bistró. Quisiera consultar disponibilidad del ${p.name}.`;
     return `
       ${opts}
       ${toppings}
@@ -160,9 +159,8 @@
           <output aria-live="polite">1</output>
           <button type="button" data-qty="1" aria-label="Agregar uno">${icon("plus")}</button>
         </div>
-        <button type="button" class="btn btn-primary add-btn" data-add>Agregar al pedido</button>
-      </div>
-      <a class="product-cta" href="${waLink(ctaText)}" target="_blank" rel="noopener">${icon("whatsapp")} ${esc(p.cta)}</a>`;
+        <button type="button" class="btn btn-primary add-btn" data-add>${icon("cart")} Agregar al pedido</button>
+      </div>`;
   }
 
   function productCard(p) {
@@ -183,7 +181,7 @@
           ${p.note ? `<p class="product-note">${esc(p.note)}</p>` : ""}
           <div class="product-config">${productConfig(p, "card")}</div>
         </div>
-        <button type="button" class="product-quick" data-quick aria-label="Elegir ${esc(p.name)}">${icon("plus")}</button>
+        <button type="button" class="product-quick" data-quick aria-label="Agregar ${esc(p.name)} al pedido">${icon("cart")}</button>
       </article>`;
   }
 
@@ -211,7 +209,7 @@
 
     add.classList.add("added");
     add.innerHTML = `${icon("check")} Agregado`;
-    setTimeout(() => { add.classList.remove("added"); add.textContent = "Agregar al pedido"; }, 1600);
+    setTimeout(() => { add.classList.remove("added"); add.innerHTML = `${icon("cart")} Agregar al pedido`; }, 1600);
     const out = $("output", root);
     out.value = out.textContent = "1";
     toast(`${icon("check")} ${esc(p.name)} agregado a tu pedido`);
@@ -259,11 +257,6 @@
       entries.forEach((en) => { if (en.isIntersecting) setActive(en.target.id.slice(4)); });
     }, { rootMargin: "-35% 0px -60% 0px" });
     $$(".cat-group", grid).forEach((g) => io.observe(g));
-
-    // Marca cuando la lista de productos está en pantalla (para apartar el WhatsApp flotante)
-    new IntersectionObserver(([en]) => document.body.classList.toggle("in-menu", en.isIntersecting))
-      .observe(grid);
-
     // Interacción dentro de las cards
     grid.addEventListener("click", (e) => {
       const card = e.target.closest(".product");
@@ -478,7 +471,8 @@
 
       document.addEventListener("click", (e) => {
         // Con productos en el carrito, cualquier "Pedir por WhatsApp" envía el detalle del pedido
-        if (e.target.closest('[data-wa="general"]') && Cart.count()) {
+        // (el botón flotante de WhatsApp siempre abre el chat directo, para consultas)
+        if (e.target.closest('[data-wa="general"]:not(.wa-float)') && Cart.count()) {
           e.preventDefault();
           if (!this.el.classList.contains("open")) this.open();
           this.go("checkout");
