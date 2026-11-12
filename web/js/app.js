@@ -128,7 +128,11 @@
     return `<span class="product-price">${prices.length > 1 ? "desde " : ""}${money(min)}</span>`;
   }
 
-  function productCard(p) {
+  // En celular el menú se muestra en filas compactas y el detalle se elige en una ficha
+  const compactMQ = window.matchMedia("(max-width: 639px)");
+
+  /** Presentación, topping, cantidad y botón de agregar. `prefix` evita ids repetidos. */
+  function productConfig(p, prefix) {
     const opts = p.options.length > 1
       ? `<div class="opt-group" role="radiogroup" aria-label="Presentación de ${esc(p.name)}">
           ${p.options.map((o, i) => `
@@ -139,20 +143,34 @@
       : "";
     const toppings = p.toppings
       ? `<div class="topping-select">
-          <label for="tp-${p.id}">Topping (opcional)</label>
-          <select id="tp-${p.id}" data-topping>
+          <label for="tp-${prefix}-${p.id}">Topping (opcional)</label>
+          <select id="tp-${prefix}-${p.id}" data-topping>
             <option value="">Sin topping</option>
             ${D.toppings.map((t) => `<option value="${t.id}">${esc(t.name)}</option>`).join("")}
           </select>
         </div>`
       : "";
     const ctaText = p.message || `Hola Lantana Café Bistró. Quisiera consultar disponibilidad del ${p.name}.`;
-
     return `
-      <article class="product reveal" data-id="${p.id}" data-category="${p.category}">
+      ${opts}
+      ${toppings}
+      <div class="product-actions">
+        <div class="qty" aria-label="Cantidad">
+          <button type="button" data-qty="-1" aria-label="Quitar uno">${icon("minus")}</button>
+          <output aria-live="polite">1</output>
+          <button type="button" data-qty="1" aria-label="Agregar uno">${icon("plus")}</button>
+        </div>
+        <button type="button" class="btn btn-primary add-btn" data-add>Agregar al pedido</button>
+      </div>
+      <a class="product-cta" href="${waLink(ctaText)}" target="_blank" rel="noopener">${icon("whatsapp")} ${esc(p.cta)}</a>`;
+  }
+
+  function productCard(p) {
+    return `
+      <article class="product" data-id="${p.id}" data-category="${p.category}">
         <div class="product-media">
-          <img src="${imgSrc(p.img, 800)}" srcset="${imgSrcset(p.img, [480, 800, 1100])}"
-               sizes="(min-width: 960px) 33vw, (min-width: 640px) 50vw, 100vw"
+          <img src="${imgSrc(p.img, 800)}" srcset="${imgSrcset(p.img, [240, 480, 800, 1100])}"
+               sizes="(min-width: 960px) 33vw, (min-width: 640px) 50vw, 120px"
                alt="${esc(p.alt)}" width="800" height="680" loading="lazy" decoding="async">
           ${p.badge ? `<span class="product-badge">${esc(p.badge)}</span>` : ""}
         </div>
@@ -163,109 +181,167 @@
           </div>
           <p class="product-desc">${esc(p.description)}</p>
           ${p.note ? `<p class="product-note">${esc(p.note)}</p>` : ""}
-          ${opts}
-          ${toppings}
-          <div class="product-actions">
-            <div class="qty" aria-label="Cantidad">
-              <button type="button" data-qty="-1" aria-label="Quitar uno">${icon("minus")}</button>
-              <output aria-live="polite">1</output>
-              <button type="button" data-qty="1" aria-label="Agregar uno">${icon("plus")}</button>
-            </div>
-            <button type="button" class="btn btn-primary add-btn" data-add>Agregar al pedido</button>
-          </div>
-          <a class="product-cta" href="${waLink(ctaText)}" target="_blank" rel="noopener">${icon("whatsapp")} ${esc(p.cta)}</a>
+          <div class="product-config">${productConfig(p, "card")}</div>
         </div>
+        <button type="button" class="product-quick" data-quick aria-label="Elegir ${esc(p.name)}">${icon("plus")}</button>
       </article>`;
+  }
+
+  /** Clics dentro de una card o de la ficha. Devuelve true si se agregó al pedido. */
+  function handleConfigClick(e, root) {
+    const opt = e.target.closest(".opt");
+    if (opt) {
+      $$(".opt", root).forEach((o) => o.setAttribute("aria-checked", String(o === opt)));
+      return false;
+    }
+    const q = e.target.closest("[data-qty]");
+    if (q) {
+      const out = $("output", root);
+      out.value = out.textContent = String(Math.min(50, Math.max(1, Number(out.textContent) + Number(q.dataset.qty))));
+      return false;
+    }
+    const add = e.target.closest("[data-add]");
+    if (!add) return false;
+    const p = D.products.find((x) => x.id === root.dataset.id);
+    const selected = $(".opt[aria-checked='true']", root);
+    const optionId = selected ? selected.dataset.opt : p.options[0].id;
+    const topping = $("[data-topping]", root)?.value || "";
+    const qty = Number($("output", root).textContent);
+    Cart.add(p.id, optionId, topping, qty);
+
+    add.classList.add("added");
+    add.innerHTML = `${icon("check")} Agregado`;
+    setTimeout(() => { add.classList.remove("added"); add.textContent = "Agregar al pedido"; }, 1600);
+    const out = $("output", root);
+    out.value = out.textContent = "1";
+    toast(`${icon("check")} ${esc(p.name)} agregado a tu pedido`);
+    return true;
   }
 
   function initCatalog() {
     const grid = $("#product-grid");
-    grid.innerHTML = D.products.map(productCard).join("");
+    const cats = D.categories.filter((c) => c.id !== "todos" && D.products.some((p) => p.category === c.id));
 
-    // Filtros
-    const filters = $("#filters");
-    filters.innerHTML = D.categories.map((c, i) =>
-      `<button type="button" class="chip" role="tab" aria-selected="${i === 0}" data-filter="${c.id}">${esc(c.label)}</button>`
+    // Productos agrupados por categoría
+    grid.innerHTML = cats.map((c) => {
+      const items = D.products.filter((p) => p.category === c.id);
+      return `
+        <section class="cat-group" id="cat-${c.id}" aria-labelledby="cat-title-${c.id}">
+          <div class="cat-head">
+            <h3 class="cat-title" id="cat-title-${c.id}">${esc(c.label)}</h3>
+            <span class="cat-count">${items.length} ${items.length === 1 ? "producto" : "productos"}</span>
+          </div>
+          <div class="product-list">${items.map(productCard).join("")}</div>
+        </section>`;
+    }).join("");
+
+    // Pestañas: llevan a cada categoría y se marcan solas al deslizar
+    const nav = $("#filters");
+    nav.innerHTML = cats.map((c, i) =>
+      `<a class="chip" href="#cat-${c.id}" data-cat="${c.id}"${i === 0 ? ' aria-current="true"' : ""}>${esc(c.label)}</a>`
     ).join("");
-    filters.addEventListener("click", (e) => {
-      const btn = e.target.closest("[data-filter]");
-      if (!btn) return;
-      $$(".chip", filters).forEach((c) => c.setAttribute("aria-selected", String(c === btn)));
-      const f = btn.dataset.filter;
-      $$(".product", grid).forEach((card) => {
-        const show = f === "todos" || card.dataset.category === f;
-        card.classList.toggle("is-hidden", !show);
-        if (show) card.classList.add("in");
-      });
+    const chips = $$(".chip", nav);
+    const setActive = (id) => {
+      chips.forEach((c) => (c.dataset.cat === id ? c.setAttribute("aria-current", "true") : c.removeAttribute("aria-current")));
+      const chip = chips.find((c) => c.dataset.cat === id);
+      if (chip && nav.scrollWidth > nav.clientWidth) {
+        nav.scrollTo({ left: chip.offsetLeft - (nav.clientWidth - chip.offsetWidth) / 2, behavior: reduceMotion ? "auto" : "smooth" });
+      }
+    };
+    nav.addEventListener("click", (e) => {
+      const a = e.target.closest("[data-cat]");
+      if (!a) return;
+      e.preventDefault();
+      setActive(a.dataset.cat);
+      $(`#cat-${a.dataset.cat}`).scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
     });
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => { if (en.isIntersecting) setActive(en.target.id.slice(4)); });
+    }, { rootMargin: "-35% 0px -60% 0px" });
+    $$(".cat-group", grid).forEach((g) => io.observe(g));
+
+    // Marca cuando la lista de productos está en pantalla (para apartar el WhatsApp flotante)
+    new IntersectionObserver(([en]) => document.body.classList.toggle("in-menu", en.isIntersecting))
+      .observe(grid);
 
     // Interacción dentro de las cards
     grid.addEventListener("click", (e) => {
       const card = e.target.closest(".product");
       if (!card) return;
-
-      const opt = e.target.closest(".opt");
-      if (opt) {
-        $$(".opt", card).forEach((o) => o.setAttribute("aria-checked", String(o === opt)));
+      if (compactMQ.matches) {
+        // Fila compacta: abre la ficha del producto
+        e.preventDefault();
+        Sheet.open(card.dataset.id);
         return;
       }
-      const q = e.target.closest("[data-qty]");
-      if (q) {
-        const out = $("output", card);
-        out.value = out.textContent = String(Math.min(50, Math.max(1, Number(out.textContent) + Number(q.dataset.qty))));
-        return;
-      }
-      const add = e.target.closest("[data-add]");
-      if (add) {
-        const p = D.products.find((x) => x.id === card.dataset.id);
-        const selected = $(".opt[aria-checked='true']", card);
-        const optionId = selected ? selected.dataset.opt : p.options[0].id;
-        const topping = $("[data-topping]", card)?.value || "";
-        const qty = Number($("output", card).textContent);
-        Cart.add(p.id, optionId, topping, qty);
-
-        add.classList.add("added");
-        add.innerHTML = `${icon("check")} Agregado`;
-        setTimeout(() => { add.classList.remove("added"); add.textContent = "Agregar al pedido"; }, 1600);
-        const out = $("output", card);
-        out.value = out.textContent = "1";
-        toast(`${icon("check")} ${esc(p.name)} agregado a tu pedido`);
-      }
+      handleConfigClick(e, card);
     });
   }
 
-  /** Lleva al producto en el menú y lo resalta brevemente. */
-  function focusProduct(id) {
-    const card = $(`.product[data-id="${id}"]`);
-    if (!card) return;
-    if (card.classList.contains("is-hidden")) $('[data-filter="todos"]').click();
-    card.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
-    card.classList.remove("flash");
-    void card.offsetWidth;
-    card.classList.add("flash");
-    setTimeout(() => card.classList.remove("flash"), 2200);
-  }
+  /* ---------- Ficha de producto (celular) ---------- */
+  const Sheet = {
+    el: null, backdrop: null, lastFocus: null, closeTimer: null,
 
-  function initPeek() {
-    const list = $("#peek-list");
-    list.innerHTML = D.products.filter((p) => p.featured).map((p) => `
-      <li>
-        <a class="peek-card" href="#menu" data-peek="${p.id}">
-          <img src="${imgSrc(p.img, 160)}" alt="" width="64" height="64" loading="lazy" decoding="async">
-          <span>
-            <strong>${esc(p.name)}</strong>
-            <small>${priceLabel(p).replace(/<[^>]+>/g, "")}</small>
-          </span>
-          <span class="peek-arrow">${icon("arrow-right")}</span>
-        </a>
-      </li>`).join("");
-    list.addEventListener("click", (e) => {
-      const a = e.target.closest("[data-peek]");
-      if (!a) return;
-      e.preventDefault();
-      focusProduct(a.dataset.peek);
-    });
-  }
+    init() {
+      this.el = $("#product-sheet");
+      this.backdrop = $(".sheet-backdrop");
+      document.addEventListener("click", (e) => {
+        if (e.target.closest("[data-close-sheet]")) this.close();
+      });
+      this.el.addEventListener("click", (e) => {
+        const root = e.target.closest(".sheet-product");
+        if (root && handleConfigClick(e, root)) this.closeTimer = setTimeout(() => this.close(), 700);
+      });
+      document.addEventListener("keydown", (e) => {
+        if (!this.isOpen()) return;
+        if (e.key === "Escape") this.close();
+        if (e.key === "Tab") Drawer.trap.call({ el: this.el }, e);
+      });
+      compactMQ.addEventListener("change", () => { if (this.isOpen()) this.close(); });
+    },
+    isOpen() { return this.el.classList.contains("open"); },
+
+    open(id) {
+      const p = D.products.find((x) => x.id === id);
+      if (!p) return;
+      clearTimeout(this.closeTimer);
+      $("#sheet-body").innerHTML = `
+        <div class="sheet-product" data-id="${p.id}">
+          <div class="sheet-media">
+            <img src="${imgSrc(p.img, 800)}" srcset="${imgSrcset(p.img, [480, 800])}" sizes="100vw"
+                 alt="${esc(p.alt)}" width="800" height="600" decoding="async">
+            ${p.badge ? `<span class="product-badge">${esc(p.badge)}</span>` : ""}
+          </div>
+          <div class="sheet-content">
+            <div class="product-top">
+              <h3 id="sheet-title">${esc(p.name)}</h3>
+              ${priceLabel(p)}
+            </div>
+            <p class="product-desc">${esc(p.description)}</p>
+            ${p.note ? `<p class="product-note">${esc(p.note)}</p>` : ""}
+            ${productConfig(p, "sheet")}
+          </div>
+        </div>`;
+      this.lastFocus = document.activeElement;
+      this.el.scrollTop = 0;
+      this.backdrop.hidden = false;
+      requestAnimationFrame(() => this.backdrop.classList.add("open"));
+      this.el.classList.add("open");
+      this.el.setAttribute("aria-hidden", "false");
+      document.body.classList.add("no-scroll");
+      setTimeout(() => this.el.focus({ preventScroll: true }), 60);
+    },
+    close() {
+      clearTimeout(this.closeTimer);
+      if (!this.isOpen()) return;
+      this.el.classList.remove("open");
+      this.el.setAttribute("aria-hidden", "true");
+      this.backdrop.classList.remove("open");
+      setTimeout(() => (this.backdrop.hidden = true), 400);
+      document.body.classList.remove("no-scroll");
+      if (this.lastFocus) this.lastFocus.focus({ preventScroll: true });
+    },
+  };
 
   function initToppings() {
     $("#topping-list").innerHTML = D.toppings.map((t) => `
@@ -796,12 +872,12 @@
 
   /* ---------- Inicio ---------- */
   initCatalog();
-  initPeek();
   initToppings();
   wireLinks();
   initHeader();
   Cart.load();
   Drawer.init();
+  Sheet.init();
   render();
   initContact();
   initCarousel();
