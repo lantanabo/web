@@ -627,6 +627,36 @@
     toast(`${icon("check")} Pedido copiado. Pégalo en el chat de WhatsApp`);
   }
 
+  /* ---------- Pedidos especiales (formulario) ---------- */
+  function initContact() {
+    const form = $("#contact-form");
+    $("#cf-date").min = todayISO();
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!validate([$("#cf-name"), $("#cf-phone"), $("#cf-msg")])) return;
+      const fd = new FormData(form);
+      const msg = [
+        "Hola Lantana Café Bistró. Tengo un pedido especial:\n",
+        `Nombre: ${fd.get("nombre").trim()}`,
+        `WhatsApp: ${fd.get("whatsapp").trim()}`,
+        fd.get("tipo") ? `Qué necesito: ${fd.get("tipo")}` : "",
+        fd.get("fecha") ? `Fecha del evento: ${prettyDate(fd.get("fecha"))}` : "",
+        `\nMi idea: ${fd.get("mensaje").trim()}`,
+      ].filter(Boolean).join("\n");
+
+      const url = openWhatsApp(msg);
+      $("#form-wa-again").href = url;
+      $("#form-success").hidden = false;
+    });
+
+    $("#form-reset").addEventListener("click", () => {
+      form.reset();
+      $("#form-success").hidden = true;
+      $("#cf-name").focus();
+    });
+  }
+
   /* ---------- Testimonios ---------- */
   function initCarousel() {
     $("#demo-note").hidden = !D.testimonialsAreDemo;
@@ -841,6 +871,7 @@
   Drawer.init();
   Sheet.init();
   render();
+  initContact();
   initCarousel();
   initReveal();
   initMusic();
