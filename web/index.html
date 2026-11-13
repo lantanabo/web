@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Allura&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="https://images.unsplash.com/photo-1638519651608-412009302a02?auto=format&fit=crop&w=1000&q=70" imagesrcset="https://images.unsplash.com/photo-1638519651608-412009302a02?auto=format&fit=crop&w=640&q=70 640w, https://images.unsplash.com/photo-1638519651608-412009302a02?auto=format&fit=crop&w=1000&q=70 1000w, https://images.unsplash.com/photo-1638519651608-412009302a02?auto=format&fit=crop&w=1400&q=70 1400w" imagesizes="(min-width: 960px) 52vw, 100vw">
-  <link rel="stylesheet" href="css/styles.css?v=21">
+  <link rel="stylesheet" href="css/styles.css?v=22">
   <script>document.documentElement.classList.add("js")</script>
 
   <script type="application/ld+json">
@@ -195,8 +195,8 @@
         <div class="product-grid" id="product-grid"></div>
 
         <p class="menu-note">
-          ¿Necesitas algo especial, fuera de nuestro menú?
-          <a href="#contacto">Cuéntanos tu idea</a>
+          ¿Pedido en cantidad, para una fecha especial o para regalar?
+          <a href="#contacto">Escríbenos</a>
         </p>
       </div>
     </section>
@@ -398,11 +398,11 @@
       <div class="container contact-grid">
         <div class="contact-copy">
           <p class="eyebrow reveal">Pedidos especiales</p>
-          <h2 id="contact-title" class="reveal">¿Necesitas algo especial?</h2>
-          <p class="reveal">Tortas personalizadas, mesas dulces para eventos, regalos corporativos o una idea que no está en nuestro menú. Cuéntanos qué tienes en mente y lo preparamos para ti.</p>
+          <h2 id="contact-title" class="reveal">¿Tienes algo especial en mente?</h2>
+          <p class="reveal">Un pedido en cantidad para tu reunión, una fecha importante o un detalle para regalar. Cuéntanos qué necesitas de nuestro menú y lo preparamos para esa ocasión.</p>
           <ul class="contact-facts reveal" role="list">
             <li><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg> Santa Cruz de la Sierra · Delivery Zona Norte</li>
-            <li><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg> Te recomendamos escribirnos con anticipación</li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg> Para pedidos en cantidad, escríbenos con anticipación</li>
           </ul>
           <img class="contact-tile reveal" src="assets/brand/tile-catedral.webp" alt="" width="360" height="360" loading="lazy" aria-hidden="true">
         </div>
@@ -418,32 +418,28 @@
               <input id="cf-phone" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" required placeholder="+591 7xx xxxxx">
             </div>
             <div class="field">
-              <label for="cf-type">¿Qué necesitas?</label>
-              <select id="cf-type" name="tipo">
-                <option value="">Selecciona una opción</option>
-                <option>Torta personalizada</option>
-                <option>Mesa dulce o evento</option>
-                <option>Regalo corporativo</option>
-                <option>Otra idea</option>
+              <label for="cf-product">Producto de interés</label>
+              <select id="cf-product" name="producto">
+                <option value="">Selecciona un producto</option>
               </select>
             </div>
             <div class="field">
-              <label for="cf-date">Fecha del evento</label>
+              <label for="cf-date">Fecha requerida</label>
               <input id="cf-date" name="fecha" type="date">
             </div>
             <div class="field field-full">
-              <label for="cf-msg">Cuéntanos tu idea</label>
-              <textarea id="cf-msg" name="mensaje" rows="4" required placeholder="Ocasión, cantidad de personas, sabores, decoración…"></textarea>
+              <label for="cf-msg">Mensaje</label>
+              <textarea id="cf-msg" name="mensaje" rows="4" required placeholder="Cantidades, ocasión, dedicatoria o cualquier detalle que debamos saber"></textarea>
             </div>
           </div>
-          <button class="btn btn-primary btn-block btn-lg" type="submit">Enviar mi idea</button>
+          <button class="btn btn-primary btn-block btn-lg" type="submit">Enviar consulta</button>
           <p class="fine center">Tu mensaje llegará a nuestro WhatsApp para responderte más rápido.</p>
 
           <div class="form-success" id="form-success" role="status" hidden>
             <img src="assets/brand/simbolo-azul.webp" alt="" width="400" height="405" aria-hidden="true">
-            <p class="h3">¡Gracias! Te escribiremos para conversar los detalles.</p>
+            <p class="h3">¡Gracias! Te escribiremos para coordinar los detalles.</p>
             <a class="btn btn-ghost btn-sm" id="form-wa-again" href="#" target="_blank" rel="noopener">Abrir WhatsApp nuevamente</a>
-            <button class="link" type="button" id="form-reset">Enviar otra idea</button>
+            <button class="link" type="button" id="form-reset">Enviar otra consulta</button>
           </div>
         </form>
       </div>
@@ -644,7 +640,7 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   </svg>
 
-  <script src="js/data.js?v=21"></script>
-  <script src="js/app.js?v=21" defer></script>
+  <script src="js/data.js?v=22"></script>
+  <script src="js/app.js?v=22" defer></script>
 </body>
 </html>

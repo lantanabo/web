@@ -630,6 +630,8 @@
   /* ---------- Pedidos especiales (formulario) ---------- */
   function initContact() {
     const form = $("#contact-form");
+    // Solo productos del menú (se actualiza solo al editar data.js)
+    $("#cf-product").innerHTML += D.products.map((p) => `<option>${esc(p.name)}</option>`).join("") + `<option>Varios productos</option>`;
     $("#cf-date").min = todayISO();
 
     form.addEventListener("submit", (e) => {
@@ -637,12 +639,12 @@
       if (!validate([$("#cf-name"), $("#cf-phone"), $("#cf-msg")])) return;
       const fd = new FormData(form);
       const msg = [
-        "Hola Lantana Café Bistró. Tengo un pedido especial:\n",
+        "Hola Lantana Café Bistró. Tengo una consulta sobre un pedido:\n",
         `Nombre: ${fd.get("nombre").trim()}`,
         `WhatsApp: ${fd.get("whatsapp").trim()}`,
-        fd.get("tipo") ? `Qué necesito: ${fd.get("tipo")}` : "",
-        fd.get("fecha") ? `Fecha del evento: ${prettyDate(fd.get("fecha"))}` : "",
-        `\nMi idea: ${fd.get("mensaje").trim()}`,
+        fd.get("producto") ? `Producto de interés: ${fd.get("producto")}` : "",
+        fd.get("fecha") ? `Fecha requerida: ${prettyDate(fd.get("fecha"))}` : "",
+        `\nMensaje: ${fd.get("mensaje").trim()}`,
       ].filter(Boolean).join("\n");
 
       const url = openWhatsApp(msg);
