@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Lantana Café Bistró | Cheesecakes y tortas a domicilio en Santa Cruz, Bolivia</title>
-  <meta name="description" content="Cheesecake Vasco, New York, Oreo, tortas, brownies y cuñapé con delivery en Zona Norte y Centro de Santa Cruz de la Sierra. Haz tu pedido online y recíbelo en tu puerta.">
+  <meta name="description" content="Cheesecake Vasco, New York, Oreo, tortas, brownies y cuñapé con delivery en la Zona Norte de Santa Cruz de la Sierra. Haz tu pedido online y recíbelo en tu puerta.">
   <meta name="keywords" content="cheesecake Santa Cruz, cheesecake Santa Cruz Bolivia, cheesecake delivery Santa Cruz, cheesecake vasco Santa Cruz, cheesecake oreo Santa Cruz, mini cheesecake Santa Cruz, tortas Santa Cruz, tortas delivery Santa Cruz, postres Santa Cruz, cuñapé Santa Cruz">
   <meta name="theme-color" content="#0A1A56">
   <!-- TODO: actualizar con el dominio definitivo -->
@@ -15,7 +15,7 @@
   <meta property="og:locale" content="es_BO">
   <meta property="og:site_name" content="Lantana Café Bistró">
   <meta property="og:title" content="Lantana Café Bistró · Momentos que merecen algo especial">
-  <meta property="og:description" content="Cheesecakes, tortas y sabores artesanales con delivery en Zona Norte y Centro de Santa Cruz de la Sierra.">
+  <meta property="og:description" content="Cheesecakes, tortas y sabores artesanales con delivery en la Zona Norte de Santa Cruz de la Sierra.">
   <meta property="og:url" content="https://www.lantanacafebistro.com/">
   <meta property="og:image" content="https://www.lantanacafebistro.com/assets/og-image.jpg">
   <meta property="og:image:width" content="1080">
@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Allura&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="https://images.unsplash.com/photo-1638519651608-412009302a02?auto=format&fit=crop&w=1000&q=70" imagesrcset="https://images.unsplash.com/photo-1638519651608-412009302a02?auto=format&fit=crop&w=640&q=70 640w, https://images.unsplash.com/photo-1638519651608-412009302a02?auto=format&fit=crop&w=1000&q=70 1000w, https://images.unsplash.com/photo-1638519651608-412009302a02?auto=format&fit=crop&w=1400&q=70 1400w" imagesizes="(min-width: 960px) 52vw, 100vw">
-  <link rel="stylesheet" href="css/styles.css?v=19">
+  <link rel="stylesheet" href="css/styles.css?v=20">
   <script>document.documentElement.classList.add("js")</script>
 
   <script type="application/ld+json">
@@ -39,7 +39,7 @@
     "@type": "Bakery",
     "name": "Lantana Café Bistró",
     "slogan": "Momentos que merecen algo especial.",
-    "description": "Cheesecakes, tortas y productos artesanales con delivery exclusivo en Zona Norte y Zona Centro de Santa Cruz de la Sierra, Bolivia.",
+    "description": "Cheesecakes, tortas y productos artesanales con delivery exclusivo en la Zona Norte de Santa Cruz de la Sierra, Bolivia.",
     "url": "https://www.lantanacafebistro.com/",
     "image": "https://www.lantanacafebistro.com/assets/og-image.jpg",
     "logo": "https://www.lantanacafebistro.com/assets/brand/logo-azul.png",
@@ -54,8 +54,7 @@
       "addressCountry": "BO"
     },
     "areaServed": [
-      {"@type": "Place", "name": "Zona Norte, Santa Cruz de la Sierra"},
-      {"@type": "Place", "name": "Zona Centro, Santa Cruz de la Sierra"}
+      {"@type": "Place", "name": "Zona Norte, Santa Cruz de la Sierra"}
     ],
     "potentialAction": {
       "@type": "OrderAction",
@@ -113,7 +112,7 @@
           <a class="btn btn-ghost btn-block mobile-nav-wa" data-wa="general" href="#">
             <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg> Escríbenos por WhatsApp
           </a>
-          <p class="mobile-nav-meta">Delivery · Zona Norte y Centro · Santa Cruz</p>
+          <p class="mobile-nav-meta">Delivery · Zona Norte · Santa Cruz</p>
         </div>
       </nav>
 
@@ -176,7 +175,7 @@
             <p class="store-tag">Cheesecakes, tortas y sabores artesanales</p>
           </div>
           <ul class="store-facts" role="list">
-            <li><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg> Delivery Norte y Centro</li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg> Delivery Zona Norte</li>
             <li><svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg> Pedidos por WhatsApp</li>
             <li><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg> Reservas con fecha</li>
             <li><svg class="icon" aria-hidden="true"><use href="#i-bag"/></svg> Precios en Bs</li>
@@ -195,9 +194,8 @@
 
         <div class="product-grid" id="product-grid"></div>
 
-        <p class="menu-note reveal">
-          ¿Lo necesitas para una fecha especial?
-          <a href="#" data-wa="reservar">Reservar para una fecha</a>
+        <p class="menu-note">
+          ¿Lo necesitas para una fecha especial? Elígela al finalizar tu pedido.
         </p>
       </div>
     </section>
@@ -211,10 +209,7 @@
           <p class="reveal">Combina tu cheesecake con nuestros toppings seleccionados.</p>
         </header>
         <ul class="topping-list" id="topping-list" role="list"></ul>
-        <div class="center reveal">
-          <a class="btn btn-ghost" data-wa="toppings" href="#">Consultar combinaciones</a>
-          <p class="fine">Elige tu topping al agregar cualquier cheesecake a tu pedido.</p>
-        </div>
+        <p class="fine center reveal">Elige tu topping al agregar cualquier cheesecake a tu pedido.</p>
       </div>
     </section>
 
@@ -240,7 +235,7 @@
         <li class="pillar reveal">
           <svg class="pillar-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 34V16a2 2 0 0 1 2-2h18v20"/><path d="M28 20h7l5 6v8h-12"/><circle cx="15" cy="35" r="3.5"/><circle cx="34" cy="35" r="3.5"/><path d="M8 34h3.5M18.5 34h12M37.5 34H40"/></svg>
           <h3>Directo hasta tu puerta</h3>
-          <p>Delivery cuidado en Zona Norte y Centro de Santa Cruz.</p>
+          <p>Delivery cuidado en la Zona Norte de Santa Cruz.</p>
         </li>
       </ul>
     </section>
@@ -321,25 +316,22 @@
         <ol class="steps" role="list">
           <li class="step reveal">
             <span class="step-num">01</span>
-            <h3>Elegí tu favorito</h3>
-            <p>Explora nuestros cheesecakes, tortas y productos, y agrégalos a tu pedido.</p>
+            <h3>Elige tu favorito</h3>
+            <p>Explora el menú y agrega al carrito tus cheesecakes, tortas y más.</p>
           </li>
           <li class="step reveal">
             <span class="step-num">02</span>
-            <h3>Escríbenos</h3>
-            <p>Envía tu pedido o consulta disponibilidad por WhatsApp en un solo toque.</p>
+            <h3>Envía tu pedido</h3>
+            <p>Completa tus datos de entrega y el pedido llega listo a nuestro WhatsApp.</p>
           </li>
           <li class="step reveal">
             <span class="step-num">03</span>
             <h3>Nosotros lo llevamos</h3>
-            <p>Coordinamos tu delivery en Zona Norte o Centro de Santa Cruz.</p>
+            <p>Confirmamos tu pedido y lo llevamos hasta tu puerta en la Zona Norte de Santa Cruz.</p>
           </li>
         </ol>
         <div class="center reveal">
-          <a class="btn btn-primary btn-lg" data-wa="general" href="#">
-            <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg> Realizar mi pedido
-          </a>
-          <p class="fine">WhatsApp <a href="#" data-wa="general" class="link">+591 68023040</a></p>
+          <a class="btn btn-primary btn-lg" href="#menu">Ver el menú</a>
         </div>
       </div>
     </section>
@@ -396,87 +388,22 @@
             <svg class="icon" aria-hidden="true"><use href="#i-tiktok"/></svg>
             <span><strong>TikTok</strong><small>Detrás de la cocina</small></span>
           </a></li>
-          <li class="reveal"><a class="social-card" data-wa="general" href="#">
-            <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg>
-            <span><strong>WhatsApp</strong><small>+591 68023040</small></span>
-          </a></li>
         </ul>
       </div>
     </section>
 
-    <!-- ============================== 11. CONTACTO ============================== -->
-    <section class="section contact" id="contacto" aria-labelledby="contact-title">
-      <div class="container contact-grid">
-        <div class="contact-copy">
-          <p class="eyebrow reveal">Pedidos especiales</p>
-          <h2 id="contact-title" class="reveal">¿Tienes algo especial en mente?</h2>
-          <p class="reveal">Cuéntanos qué necesitas y estaremos felices de ayudarte.</p>
-          <ul class="contact-facts reveal" role="list">
-            <li><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg> Santa Cruz de la Sierra · Delivery Zona Norte y Centro</li>
-            <li><svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg> <a href="#" data-wa="general" class="link">+591 68023040</a></li>
-            <li><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg> Reservas para fechas especiales</li>
-          </ul>
-          <img class="contact-tile reveal" src="assets/brand/tile-catedral.webp" alt="" width="360" height="360" loading="lazy" aria-hidden="true">
-        </div>
-
-        <form class="contact-form reveal" id="contact-form" novalidate>
-          <div class="form-fields">
-            <div class="field">
-              <label for="cf-name">Nombre</label>
-              <input id="cf-name" name="nombre" type="text" autocomplete="name" required placeholder="Tu nombre">
-            </div>
-            <div class="field">
-              <label for="cf-phone">WhatsApp</label>
-              <input id="cf-phone" name="whatsapp" type="tel" inputmode="tel" autocomplete="tel" required placeholder="+591 7xx xxxxx">
-            </div>
-            <div class="field">
-              <label for="cf-product">Producto de interés</label>
-              <select id="cf-product" name="producto">
-                <option value="">Selecciona una opción</option>
-              </select>
-            </div>
-            <div class="field">
-              <label for="cf-date">Fecha requerida</label>
-              <input id="cf-date" name="fecha" type="date">
-            </div>
-            <div class="field field-full">
-              <span class="label" id="cf-zone-label">Zona de entrega</span>
-              <div class="segmented" role="radiogroup" aria-labelledby="cf-zone-label">
-                <label><input type="radio" name="zona" value="Zona Norte" checked><span>Zona Norte</span></label>
-                <label><input type="radio" name="zona" value="Zona Centro"><span>Zona Centro</span></label>
-              </div>
-            </div>
-            <div class="field field-full">
-              <label for="cf-msg">Mensaje</label>
-              <textarea id="cf-msg" name="mensaje" rows="4" placeholder="Cuéntanos sobre tu ocasión, cantidades o ideas"></textarea>
-            </div>
-          </div>
-          <button class="btn btn-primary btn-block btn-lg" type="submit">Enviar consulta</button>
-          <p class="fine center">Tu consulta se enviará a nuestro WhatsApp para responderte más rápido.</p>
-
-          <div class="form-success" id="form-success" role="status" hidden>
-            <img src="assets/brand/simbolo-azul.webp" alt="" width="400" height="405" aria-hidden="true">
-            <p class="h3">¡Gracias! Nos pondremos en contacto contigo para coordinar los detalles.</p>
-            <a class="btn btn-ghost btn-sm" id="form-wa-again" href="#" target="_blank" rel="noopener">Abrir WhatsApp nuevamente</a>
-            <button class="link" type="button" id="form-reset">Enviar otra consulta</button>
-          </div>
-        </form>
-      </div>
-    </section>
-
-    <!-- ============================== 12. CTA FINAL ============================== -->
+    <!-- ============================== 11. CTA FINAL ============================== -->
     <section class="final-cta" id="pedir" aria-labelledby="final-title">
       <div class="container narrow center">
         <img class="final-flower" src="assets/brand/simbolo-marfil.webp" alt="" width="400" height="405" aria-hidden="true" loading="lazy">
         <h2 id="final-title" class="reveal">Algo delicioso puede estar más cerca de lo que imaginas.</h2>
         <p class="reveal">Elige tu favorito y nosotros lo llevamos hasta tu puerta.</p>
-        <a class="btn btn-light btn-xl reveal" data-wa="general" href="#">
-          <svg class="icon" aria-hidden="true"><use href="#i-whatsapp"/></svg> Pedir ahora por WhatsApp
+        <a class="btn btn-light btn-xl reveal" href="#menu">
+          <svg class="icon" aria-hidden="true"><use href="#i-cart"/></svg> Ver el menú
         </a>
         <ul class="final-meta reveal" role="list">
-          <li>+591 68023040</li>
           <li>Santa Cruz de la Sierra</li>
-          <li>Delivery Zona Norte y Centro</li>
+          <li>Delivery Zona Norte</li>
         </ul>
       </div>
     </section>
@@ -496,11 +423,11 @@
         <h3 class="footer-title">Visítanos online</h3>
         <ul role="list">
           <li>Santa Cruz de la Sierra, Bolivia</li>
-          <li>Delivery Zona Norte y Centro</li>
+          <li>Delivery Zona Norte</li>
           <li>Pedidos únicamente online</li>
         </ul>
       </div>
-      <div>
+      <div id="contacto">
         <h3 class="footer-title">Contacto</h3>
         <ul role="list">
           <li><a href="#" data-wa="general">WhatsApp +591 68023040</a></li>
@@ -565,13 +492,8 @@
         <label for="co-name">Nombre</label>
         <input id="co-name" name="nombre" type="text" autocomplete="name" required placeholder="¿A nombre de quién?">
       </div>
-      <div class="field">
-        <span class="label" id="co-zone-label">Zona de entrega</span>
-        <div class="segmented" role="radiogroup" aria-labelledby="co-zone-label">
-          <label><input type="radio" name="zona" value="Zona Norte" checked><span>Zona Norte</span></label>
-          <label><input type="radio" name="zona" value="Zona Centro"><span>Zona Centro</span></label>
-        </div>
-      </div>
+      <input type="hidden" name="zona" value="Zona Norte">
+      <p class="zone-note"><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg> Delivery exclusivo en la Zona Norte de Santa Cruz</p>
       <div class="field">
         <label for="co-address">Dirección o referencia</label>
         <input id="co-address" name="direccion" type="text" autocomplete="street-address" placeholder="Barrio, calle, referencia (opcional)">
@@ -610,7 +532,7 @@
       <p>Solo presiona <strong>enviar</strong> en el chat. Te confirmaremos disponibilidad y delivery en breve.</p>
       <a class="btn btn-ghost btn-sm" id="cart-wa-again" href="#" target="_blank" rel="noopener">Abrir WhatsApp nuevamente</a>
       <button class="link" type="button" data-copy-order>Copiar texto del pedido</button>
-      <button class="btn btn-primary btn-sm" type="button" id="cart-new">Empezar un nuevo pedido</button>
+      <button class="btn btn-primary btn-sm" type="button" id="cart-new">Seguir viendo el menú</button>
     </div>
 
     <footer class="drawer-foot" id="drawer-foot">
@@ -665,7 +587,7 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   </svg>
 
-  <script src="js/data.js?v=19"></script>
-  <script src="js/app.js?v=19" defer></script>
+  <script src="js/data.js?v=20"></script>
+  <script src="js/app.js?v=20" defer></script>
 </body>
 </html>

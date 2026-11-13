@@ -42,7 +42,7 @@ Si alguna imagen no carga, el sitio muestra automáticamente el patrón de azule
 
 1. El cliente elige presentación (porción/entero), topping y cantidad → **Agregar al pedido**.
 2. El carrito (se guarda en el navegador) muestra el total estimado.
-3. Completa nombre, zona (Norte/Centro), dirección, fecha y horario.
+3. Completa nombre, zona (solo Zona Norte), dirección, fecha y horario.
 4. Se abre WhatsApp (+591 68023040) con el pedido completo ya redactado; solo debe presionar enviar.
 
 El formulario de contacto también se envía como mensaje de WhatsApp (no requiere servidor).

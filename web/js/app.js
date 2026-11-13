@@ -469,15 +469,9 @@
       this.el = $("#cart");
       this.backdrop = $(".drawer-backdrop");
 
+      // Los enlaces de WhatsApp siempre abren el chat directo (consultas);
+      // los pedidos se envían desde el carrito.
       document.addEventListener("click", (e) => {
-        // Con productos en el carrito, cualquier "Pedir por WhatsApp" envía el detalle del pedido
-        // (el botón flotante de WhatsApp siempre abre el chat directo, para consultas)
-        if (e.target.closest('[data-wa="general"]:not(.wa-float)') && Cart.count()) {
-          e.preventDefault();
-          if (!this.el.classList.contains("open")) this.open();
-          this.go("checkout");
-          return;
-        }
         if (e.target.closest("[data-open-cart]")) { e.preventDefault(); this.open(); }
         else if (e.target.closest("[data-close-cart]")) this.close();
       });
@@ -498,7 +492,7 @@
 
       $("#cart-next").addEventListener("click", () => this.go("checkout"));
       $("#cart-back").addEventListener("click", () => this.go("items"));
-      $("#cart-new").addEventListener("click", () => { Cart.clear(); $("#checkout-form").reset(); this.go("items"); this.close(); });
+      $("#cart-new").addEventListener("click", () => { this.go("items"); this.close(); });
 
       const date = $("#co-date");
       date.min = todayISO();
@@ -600,6 +594,13 @@
     const url = openWhatsApp(lastOrderText);
     $("#cart-wa-again").href = url;
     Drawer.go("done");
+    // El pedido ya salió: se vacía el carrito y se limpian fecha, horario y notas
+    // (nombre y dirección se mantienen para el próximo pedido).
+    Cart.clear();
+    ["fecha", "horario", "notas"].forEach((n) => {
+      const el = form.elements[n];
+      el.value = el.tagName === "SELECT" ? el.options[0].value : "";
+    });
   }
 
   let lastOrderText = "";
@@ -624,39 +625,6 @@
       ta.remove();
     }
     toast(`${icon("check")} Pedido copiado. Pégalo en el chat de WhatsApp`);
-  }
-
-  /* ---------- Formulario de contacto ---------- */
-  function initContact() {
-    const form = $("#contact-form");
-    const select = $("#cf-product");
-    select.innerHTML += D.products.map((p) => `<option>${esc(p.name)}</option>`).join("") + `<option>Otro / pedido especial</option>`;
-    $("#cf-date").min = todayISO();
-
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      if (!validate([$("#cf-name"), $("#cf-phone")])) return;
-      const fd = new FormData(form);
-      const msg = [
-        "Hola Lantana Café Bistró. Tengo una consulta:\n",
-        `Nombre: ${fd.get("nombre").trim()}`,
-        `WhatsApp: ${fd.get("whatsapp").trim()}`,
-        fd.get("producto") ? `Producto de interés: ${fd.get("producto")}` : "",
-        fd.get("fecha") ? `Fecha requerida: ${prettyDate(fd.get("fecha"))}` : "",
-        `Zona de entrega: ${fd.get("zona")}`,
-        fd.get("mensaje").trim() ? `\nMensaje: ${fd.get("mensaje").trim()}` : "",
-      ].filter(Boolean).join("\n");
-
-      const url = openWhatsApp(msg);
-      $("#form-wa-again").href = url;
-      $("#form-success").hidden = false;
-    });
-
-    $("#form-reset").addEventListener("click", () => {
-      form.reset();
-      $("#form-success").hidden = true;
-      $("#cf-name").focus();
-    });
   }
 
   /* ---------- Testimonios ---------- */
@@ -873,7 +841,6 @@
   Drawer.init();
   Sheet.init();
   render();
-  initContact();
   initCarousel();
   initReveal();
   initMusic();

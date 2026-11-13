@@ -23,7 +23,7 @@ window.LANTANA = {
   instagram: "https://www.instagram.com/lantana.cafebistro/",
   tiktok: "https://www.tiktok.com/@lantana.cafebistr",
 
-  zones: ["Zona Norte", "Zona Centro"],
+  zones: ["Zona Norte"],
 
   messages: {
     general: "Hola Lantana Café Bistró. Quisiera realizar un pedido. ¿Podrían ayudarme con la disponibilidad?",
@@ -163,8 +163,8 @@ window.LANTANA = {
   testimonialsAreDemo: true,
   testimonials: [
     { quote: "El cheesecake estaba increíblemente cremoso y llegó perfectamente presentado.", author: "Cliente de ejemplo", detail: "Zona Norte" },
-    { quote: "Pedimos para compartir en familia y fue un éxito.", author: "Cliente de ejemplo", detail: "Zona Centro" },
+    { quote: "Pedimos para compartir en familia y fue un éxito.", author: "Cliente de ejemplo", detail: "Zona Norte" },
     { quote: "La presentación es preciosa y el sabor todavía mejor.", author: "Cliente de ejemplo", detail: "Zona Norte" },
-    { quote: "Perfecto para regalar o llevar a una reunión.", author: "Cliente de ejemplo", detail: "Zona Centro" },
+    { quote: "Perfecto para regalar o llevar a una reunión.", author: "Cliente de ejemplo", detail: "Zona Norte" },
   ],
 };
