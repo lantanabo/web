@@ -133,8 +133,8 @@ window.LANTANA = {
       category: "cheesecakes",
       description: "La combinación perfecta entre la cremosidad del cheesecake y el sabor irresistible de Oreo.",
       story: "Un relleno suave y cremoso con todo el sabor de Oreo, sobre una base crujiente de galleta. Es ese postre que se termina antes de que alguien alcance a pedir «¿me das un poquito?».",
-      img: unsplash("1623548694299-c3eb13a26c5b"),
-      alt: "Porción de cheesecake de galleta Oreo",
+      img: "assets/fotos/menu/oreo.jpg",
+      alt: "Porción de cheesecake Oreo de Lantana con galletas Oreo",
       options: [
         { id: "porcion", label: "Porción", price: 35 },
         { id: "entero", label: "Entero", price: 300 },
