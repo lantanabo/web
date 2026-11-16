@@ -143,10 +143,15 @@
     return { src, alt };
   }
 
-  /** Foto con la que abre el producto: primera presentación + topping por defecto. */
+  /** Presentación elegida al abrir: `defaultOption` (si existe) o la primera. */
+  function defaultOpt(p) {
+    return p.options.some((o) => o.id === p.defaultOption) ? p.defaultOption : p.options[0].id;
+  }
+
+  /** Foto con la que abre el producto: presentación por defecto + topping por defecto. */
   function initialImage(p) {
     const tp = p.toppings && D.toppings.some((t) => t.id === p.defaultTopping) ? p.defaultTopping : "";
-    return variantImage(p, p.options[0].id, tp);
+    return variantImage(p, defaultOpt(p), tp);
   }
 
   /** Cambia la foto de una card o ficha para reflejar lo que el cliente eligió. */
@@ -155,7 +160,7 @@
     const img = $("[data-media]", root);
     if (!p || !p.variants || !img) return;
     const selected = $(".opt[aria-checked='true']", root);
-    const { src, alt } = variantImage(p, selected ? selected.dataset.opt : p.options[0].id, $("[data-topping]", root)?.value);
+    const { src, alt } = variantImage(p, selected ? selected.dataset.opt : defaultOpt(p), $("[data-topping]", root)?.value);
     const target = imgSrc(src, 800);
     if (img.getAttribute("src") === target) return;
     img.classList.add("swapping");
@@ -186,7 +191,7 @@
     const opts = p.options.length > 1
       ? `<div class="opt-group" role="radiogroup" aria-label="Presentación de ${esc(p.name)}">
           ${p.options.map((o, i) => `
-            <button type="button" class="opt" role="radio" aria-checked="${i === 0}" data-opt="${o.id}">
+            <button type="button" class="opt" role="radio" aria-checked="${o.id === defaultOpt(p)}" data-opt="${o.id}">
               <span>${esc(o.label)}</span><small>${o.price != null ? money(o.price) : "A consultar"}</small>
             </button>`).join("")}
         </div>`
@@ -260,7 +265,7 @@
     if (!add) return false;
     const p = D.products.find((x) => x.id === root.dataset.id);
     const selected = $(".opt[aria-checked='true']", root);
-    const optionId = selected ? selected.dataset.opt : p.options[0].id;
+    const optionId = selected ? selected.dataset.opt : defaultOpt(p);
     const topping = $("[data-topping]", root)?.value || "";
     const qty = Number($("output", root).textContent);
     Cart.add(p.id, optionId, topping, qty);

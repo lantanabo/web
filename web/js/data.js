@@ -61,9 +61,10 @@ window.LANTANA = {
       img: "assets/fotos/menu/mini-pack6-frutos-del-bosque.jpg",
       alt: "Pack de seis mini cheesecakes de Lantana con topping de frutos del bosque",
       options: [
-        { id: "pack6", label: "Pack x6", price: 150 },
         { id: "unidad", label: "Unidad", price: 30 },
+        { id: "pack6", label: "Pack x6", price: 150 },
       ],
+      defaultOption: "pack6", // presentación que aparece elegida al abrir
       toppings: true,
       variants: {
         unidad: {
@@ -162,8 +163,8 @@ window.LANTANA = {
       img: "assets/fotos/menu/bruce-porcion.jpg",
       alt: "Porción de torta de chocolate Bruce Bruce de Lantana, con capas y cobertura de chocolate",
       options: [
-        { id: "porcion", label: "Porción", price: 35 },
-        { id: "entera", label: "Torta entera", price: 300 },
+        { id: "porcion", label: "Porción", price: 25 },
+        { id: "entera", label: "Torta entera", price: 220 },
       ],
       variants: {
         porcion: { "sin-topping": "assets/fotos/menu/bruce-porcion.jpg" },
