@@ -108,6 +108,8 @@ window.LANTANA = {
     },
     {
       id: "cheesecake-vasco",
+      // Temporal: se muestra como "No disponible" y no se puede pedir. Para volver a venderlo, borra esta línea.
+      unavailable: true,
       featured: true,
       name: "Cheesecake Vasco",
       category: "cheesecakes",
@@ -164,6 +166,8 @@ window.LANTANA = {
     },
     {
       id: "brownie",
+      // Temporal: se muestra como "No disponible" y no se puede pedir. Para volver a venderlo, borra esta línea.
+      unavailable: true,
       name: "Brownie",
       category: "clasicos",
       description: "Intenso, húmedo y chocolatoso. Ideal para acompañar el café o simplemente darse un gusto.",

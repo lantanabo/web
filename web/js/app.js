@@ -122,6 +122,7 @@
 
   /* ---------- Catálogo ---------- */
   function priceLabel(p) {
+    if (p.unavailable) return `<span class="product-price tbc">No disponible</span>`;
     if (p.comingSoon) return `<span class="product-price tbc">Muy pronto</span>`;
     const prices = p.options.map((o) => o.price).filter((n) => n != null);
     if (!prices.length) return `<span class="product-price tbc">Precio a confirmar</span>`;
@@ -176,6 +177,9 @@
   function productConfig(p, prefix) {
     const story = p.story ? `<p class="product-story">${esc(p.story)}</p>` : "";
     // Producto temporalmente no disponible: se ve en el menú pero no se puede pedir
+    if (p.unavailable) {
+      return `${story}<p class="soon-note">No disponible por el momento.</p>`;
+    }
     if (p.comingSoon) {
       return `${story}<p class="soon-note">Muy pronto disponible para pedir. ¡Estamos preparando algo delicioso!</p>`;
     }
@@ -211,14 +215,14 @@
   }
 
   function badge(p) {
-    const text = p.comingSoon ? "Muy pronto" : p.badge;
-    return text ? `<span class="product-badge${p.comingSoon ? " soon" : ""}">${esc(text)}</span>` : "";
+    const text = p.unavailable ? "No disponible" : p.comingSoon ? "Muy pronto" : p.badge;
+    return text ? `<span class="product-badge${p.comingSoon || p.unavailable ? " soon" : ""}">${esc(text)}</span>` : "";
   }
 
   function productCard(p) {
     const media = initialImage(p);
     return `
-      <article class="product${p.comingSoon ? " is-soon" : ""}" data-id="${p.id}" data-category="${p.category}">
+      <article class="product${p.comingSoon || p.unavailable ? " is-soon" : ""}" data-id="${p.id}" data-category="${p.category}">
         <div class="product-media">
           <img data-media src="${imgSrc(media.src, 800)}" srcset="${imgSrcset(media.src, [240, 480, 800, 1100])}"
                sizes="(min-width: 960px) 33vw, (min-width: 640px) 50vw, 120px"
@@ -234,7 +238,7 @@
           ${p.note ? `<p class="product-note">${esc(p.note)}</p>` : ""}
           <div class="product-config">${productConfig(p, "card")}</div>
         </div>
-        ${p.comingSoon ? "" : `<button type="button" class="product-quick" data-quick aria-label="Agregar ${esc(p.name)} al pedido">${icon("cart")}</button>`}
+        ${p.comingSoon || p.unavailable ? "" : `<button type="button" class="product-quick" data-quick aria-label="Agregar ${esc(p.name)} al pedido">${icon("cart")}</button>`}
       </article>`;
   }
 
@@ -423,7 +427,7 @@
     resolve(item) {
       const product = D.products.find((p) => p.id === item.productId);
       const option = product && product.options.find((o) => o.id === item.optionId);
-      if (!product || !option || product.comingSoon) return null;
+      if (!product || !option || product.comingSoon || product.unavailable) return null;
       const topping = D.toppings.find((t) => t.id === item.topping) || null;
       return { product, option, topping };
     },
