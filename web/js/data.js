@@ -5,6 +5,8 @@
    - cambiar precios (price: null  =>  se muestra "Precio a confirmar")
    - reemplazar fotografías (img.src puede ser una URL o una ruta local,
      p. ej. "assets/fotos/vasco.webp")
+   - textos de cada producto (description = línea corta; story = párrafo
+     tentador que se ve junto a las opciones de porción/entero)
    - actualizar redes sociales, número de WhatsApp o testimonios.
    ========================================================================== */
 
@@ -53,6 +55,7 @@ window.LANTANA = {
       category: "cheesecakes",
       badge: "El favorito",
       description: "Exterior intensamente caramelizado y un interior suave, cremoso y delicado.",
+      story: "Su superficie tostada guarda un sabor a caramelo que contrasta con un centro suave, casi fundente. Intenso y delicado a la vez: el capricho que no sabías que necesitabas.",
       img: unsplash("1759303380841-55c09244fd2b"),
       alt: "Porción de cheesecake vasco con superficie caramelizada, Santa Cruz",
       options: [
@@ -67,6 +70,7 @@ window.LANTANA = {
       name: "Cheesecake New York",
       category: "cheesecakes",
       description: "Cremoso, elegante y perfectamente equilibrado. Un clásico que nunca falla.",
+      story: "Denso, cremoso y sobre una base de galleta dorada que cruje en cada bocado. Solo es pura elegancia; con frutilla, maracuyá o frutos del bosque se vuelve inolvidable. Pide una porción para darte un gusto o el entero para que toda la mesa lo celebre.",
       img: "assets/fotos/menu/ny-porcion-sin-topping.jpg",
       alt: "Porción de cheesecake New York clásico de Lantana, sin topping",
       options: [
@@ -98,6 +102,7 @@ window.LANTANA = {
       name: "Cheesecake Oreo",
       category: "cheesecakes",
       description: "La combinación perfecta entre la cremosidad del cheesecake y el sabor irresistible de Oreo.",
+      story: "Un relleno suave y cremoso con todo el sabor de Oreo, sobre una base crujiente de galleta. Es ese postre que se termina antes de que alguien alcance a pedir «¿me das un poquito?».",
       img: unsplash("1623548694299-c3eb13a26c5b"),
       alt: "Porción de cheesecake de galleta Oreo",
       options: [
@@ -114,6 +119,7 @@ window.LANTANA = {
       category: "tortas",
       badge: "Para chocolate lovers",
       description: "Chocolate intenso, capas irresistibles y una textura creada para verdaderos amantes del chocolate.",
+      story: "Capas húmedas de chocolate y un relleno tan intenso que se derrite en la boca. Para cuando el antojo de chocolate no acepta un «no» por respuesta.",
       img: unsplash("1517427294546-5aa121f68e8a"),
       alt: "Porción de torta de chocolate Bruce Bruce con capas",
       options: [
@@ -129,6 +135,7 @@ window.LANTANA = {
       category: "cheesecakes",
       badge: "Ideal para regalar",
       description: "Todo el sabor de Lantana en formato individual. Perfectos para compartir, regalar, reuniones o celebraciones.",
+      story: "Pequeños en tamaño, enormes en sabor: la misma cremosidad de nuestros cheesecakes en una porción perfecta para una persona. Una cajita que convierte cualquier día en una ocasión especial.",
       note: "Consulta nuestras presentaciones y disponibilidad.",
       img: unsplash("1600383708782-42a91f5ac449"),
       alt: "Mini cheesecakes individuales con frutos rojos",
@@ -142,6 +149,7 @@ window.LANTANA = {
       name: "Brownie",
       category: "clasicos",
       description: "Intenso, húmedo y chocolatoso. Ideal para acompañar el café o simplemente darse un gusto.",
+      story: "Bordes apenas crujientes y un centro húmedo de chocolate profundo. Con un café al lado, es un abrazo en forma de postre.",
       img: unsplash("1606313564200-e75d5e30476c"),
       alt: "Brownies de chocolate húmedos con chocolate derretido",
       // Precio editable: reemplaza null por el valor en Bs (p. ej. 20)
@@ -154,6 +162,7 @@ window.LANTANA = {
       category: "clasicos",
       badge: "Clásico cruceño",
       description: "Un clásico cruceño preparado para disfrutar caliente, suave por dentro y con ese irresistible sabor a queso.",
+      story: "Dorado por fuera, tierno y elástico por dentro, con ese sabor a queso que sabe a casa. Recién horneado, es imposible comer solo uno.",
       img: unsplash("1559141680-d0bd7bc5af84"),
       alt: "Cuñapés cruceños recién horneados en Santa Cruz",
       // Precio editable: reemplaza null por el valor en Bs

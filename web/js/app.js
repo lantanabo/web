@@ -185,6 +185,7 @@
         </div>`
       : "";
     return `
+      ${p.story ? `<p class="product-story">${esc(p.story)}</p>` : ""}
       ${opts}
       ${toppings}
       <div class="product-actions">
