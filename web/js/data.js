@@ -51,18 +51,18 @@ window.LANTANA = {
   products: [
     {
       id: "mini-cheesecakes",
-      defaultTopping: "maracuya",
+      defaultTopping: "frutos-del-bosque",
       featured: true,
       name: "Mini Cheesecakes",
       category: "cheesecakes",
       badge: "Ideal para regalar",
       description: "Todo el sabor de Lantana en formato individual. Perfectos para compartir, regalar, reuniones o celebraciones.",
       story: "Pequeños en tamaño, enormes en sabor: la misma cremosidad de nuestros cheesecakes en una porción perfecta para una persona. Una cajita que convierte cualquier día en una ocasión especial.",
-      img: "assets/fotos/menu/mini-sin-topping.jpg",
-      alt: "Mini cheesecake New York individual de Lantana, sin topping",
+      img: "assets/fotos/menu/mini-pack6-frutos-del-bosque.jpg",
+      alt: "Pack de seis mini cheesecakes de Lantana con topping de frutos del bosque",
       options: [
-        { id: "unidad", label: "Unidad", price: 30 },
         { id: "pack6", label: "Pack x6", price: 150 },
+        { id: "unidad", label: "Unidad", price: 30 },
       ],
       toppings: true,
       variants: {
@@ -72,7 +72,12 @@ window.LANTANA = {
           frutilla: "assets/fotos/menu/mini-frutilla.jpg",
           maracuya: "assets/fotos/menu/mini-maracuya.jpg",
         },
-        pack6: { "sin-topping": "assets/fotos/menu/mini-pack6-sin-topping.jpg" },
+        pack6: {
+          "sin-topping": "assets/fotos/menu/mini-pack6-sin-topping.jpg",
+          "frutos-del-bosque": "assets/fotos/menu/mini-pack6-frutos-del-bosque.jpg",
+          frutilla: "assets/fotos/menu/mini-pack6-frutilla.jpg",
+          maracuya: "assets/fotos/menu/mini-pack6-maracuya.jpg",
+        },
       },
       cta: "Pedir por WhatsApp",
     },
