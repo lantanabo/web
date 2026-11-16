@@ -122,6 +122,7 @@
 
   /* ---------- Catálogo ---------- */
   function priceLabel(p) {
+    if (p.comingSoon) return `<span class="product-price tbc">Muy pronto</span>`;
     const prices = p.options.map((o) => o.price).filter((n) => n != null);
     if (!prices.length) return `<span class="product-price tbc">Precio a confirmar</span>`;
     const min = Math.min(...prices);
@@ -139,6 +140,12 @@
     const topping = hasOwn ? D.toppings.find((t) => t.id === toppingId) : null;
     const alt = `${p.name}${option ? ", " + option.label.toLowerCase() : ""}${topping ? ", con topping de " + topping.name.toLowerCase() : ", sin topping"}`;
     return { src, alt };
+  }
+
+  /** Foto con la que abre el producto: primera presentación + topping por defecto. */
+  function initialImage(p) {
+    const tp = p.toppings && D.toppings.some((t) => t.id === p.defaultTopping) ? p.defaultTopping : "";
+    return variantImage(p, p.options[0].id, tp);
   }
 
   /** Cambia la foto de una card o ficha para reflejar lo que el cliente eligió. */
@@ -167,6 +174,11 @@
 
   /** Presentación, topping, cantidad y botón de agregar. `prefix` evita ids repetidos. */
   function productConfig(p, prefix) {
+    const story = p.story ? `<p class="product-story">${esc(p.story)}</p>` : "";
+    // Producto temporalmente no disponible: se ve en el menú pero no se puede pedir
+    if (p.comingSoon) {
+      return `${story}<p class="soon-note">Muy pronto disponible para pedir. ¡Estamos preparando algo delicioso!</p>`;
+    }
     const opts = p.options.length > 1
       ? `<div class="opt-group" role="radiogroup" aria-label="Presentación de ${esc(p.name)}">
           ${p.options.map((o, i) => `
@@ -180,12 +192,12 @@
           <label for="tp-${prefix}-${p.id}">Topping (opcional)</label>
           <select id="tp-${prefix}-${p.id}" data-topping>
             <option value="">Sin topping</option>
-            ${D.toppings.map((t) => `<option value="${t.id}">${esc(t.name)}</option>`).join("")}
+            ${D.toppings.map((t) => `<option value="${t.id}"${t.id === p.defaultTopping ? " selected" : ""}>${esc(t.name)}</option>`).join("")}
           </select>
         </div>`
       : "";
     return `
-      ${p.story ? `<p class="product-story">${esc(p.story)}</p>` : ""}
+      ${story}
       ${opts}
       ${toppings}
       <div class="product-actions">
@@ -198,14 +210,20 @@
       </div>`;
   }
 
+  function badge(p) {
+    const text = p.comingSoon ? "Muy pronto" : p.badge;
+    return text ? `<span class="product-badge${p.comingSoon ? " soon" : ""}">${esc(text)}</span>` : "";
+  }
+
   function productCard(p) {
+    const media = initialImage(p);
     return `
-      <article class="product" data-id="${p.id}" data-category="${p.category}">
+      <article class="product${p.comingSoon ? " is-soon" : ""}" data-id="${p.id}" data-category="${p.category}">
         <div class="product-media">
-          <img data-media src="${imgSrc(p.img, 800)}" srcset="${imgSrcset(p.img, [240, 480, 800, 1100])}"
+          <img data-media src="${imgSrc(media.src, 800)}" srcset="${imgSrcset(media.src, [240, 480, 800, 1100])}"
                sizes="(min-width: 960px) 33vw, (min-width: 640px) 50vw, 120px"
-               alt="${esc(p.alt)}" width="800" height="680" loading="lazy" decoding="async">
-          ${p.badge ? `<span class="product-badge">${esc(p.badge)}</span>` : ""}
+               alt="${esc(media.alt)}" width="800" height="680" loading="lazy" decoding="async">
+          ${badge(p)}
         </div>
         <div class="product-body">
           <div class="product-top">
@@ -216,7 +234,7 @@
           ${p.note ? `<p class="product-note">${esc(p.note)}</p>` : ""}
           <div class="product-config">${productConfig(p, "card")}</div>
         </div>
-        <button type="button" class="product-quick" data-quick aria-label="Agregar ${esc(p.name)} al pedido">${icon("cart")}</button>
+        ${p.comingSoon ? "" : `<button type="button" class="product-quick" data-quick aria-label="Agregar ${esc(p.name)} al pedido">${icon("cart")}</button>`}
       </article>`;
   }
 
@@ -340,12 +358,13 @@
       const p = D.products.find((x) => x.id === id);
       if (!p) return;
       clearTimeout(this.closeTimer);
+      const media = initialImage(p);
       $("#sheet-body").innerHTML = `
         <div class="sheet-product" data-id="${p.id}">
           <div class="sheet-media">
-            <img data-media src="${imgSrc(p.img, 800)}" srcset="${imgSrcset(p.img, [480, 800])}" sizes="100vw"
-                 alt="${esc(p.alt)}" width="800" height="600" decoding="async">
-            ${p.badge ? `<span class="product-badge">${esc(p.badge)}</span>` : ""}
+            <img data-media src="${imgSrc(media.src, 800)}" srcset="${imgSrcset(media.src, [480, 800])}" sizes="100vw"
+                 alt="${esc(media.alt)}" width="800" height="600" decoding="async">
+            ${badge(p)}
           </div>
           <div class="sheet-content">
             <div class="product-top">
@@ -404,7 +423,7 @@
     resolve(item) {
       const product = D.products.find((p) => p.id === item.productId);
       const option = product && product.options.find((o) => o.id === item.optionId);
-      if (!product || !option) return null;
+      if (!product || !option || product.comingSoon) return null;
       const topping = D.toppings.find((t) => t.id === item.topping) || null;
       return { product, option, topping };
     },
