@@ -128,6 +128,40 @@
     return `<span class="product-price">${prices.length > 1 ? "desde " : ""}${money(min)}</span>`;
   }
 
+  /** Foto del producto según presentación y topping (ver `variants` en data.js). */
+  function variantImage(p, optionId, toppingId) {
+    const set = (p.variants && p.variants[optionId]) || {};
+    // Si el topping no tiene foto propia, mostramos la presentación sin topping
+    const hasOwn = Boolean(toppingId && set[toppingId]);
+    const src = hasOwn ? set[toppingId] : set["sin-topping"];
+    if (!src) return { src: p.img, alt: p.alt };
+    const option = p.options.find((o) => o.id === optionId);
+    const topping = hasOwn ? D.toppings.find((t) => t.id === toppingId) : null;
+    const alt = `${p.name}${option ? ", " + option.label.toLowerCase() : ""}${topping ? ", con topping de " + topping.name.toLowerCase() : ", sin topping"}`;
+    return { src, alt };
+  }
+
+  /** Cambia la foto de una card o ficha para reflejar lo que el cliente eligió. */
+  function updateMedia(root) {
+    const p = D.products.find((x) => x.id === root.dataset.id);
+    const img = $("[data-media]", root);
+    if (!p || !p.variants || !img) return;
+    const selected = $(".opt[aria-checked='true']", root);
+    const { src, alt } = variantImage(p, selected ? selected.dataset.opt : p.options[0].id, $("[data-topping]", root)?.value);
+    const target = imgSrc(src, 800);
+    if (img.getAttribute("src") === target) return;
+    img.classList.add("swapping");
+    const pre = new Image();
+    pre.onload = pre.onerror = () => {
+      delete img.dataset.fellBack;
+      img.srcset = imgSrcset(src, [480, 800, 1100]);
+      img.src = target;
+      img.alt = alt;
+      img.classList.remove("swapping");
+    };
+    pre.src = target;
+  }
+
   // En celular el menú se muestra en filas compactas y el detalle se elige en una ficha
   const compactMQ = window.matchMedia("(max-width: 639px)");
 
@@ -167,7 +201,7 @@
     return `
       <article class="product" data-id="${p.id}" data-category="${p.category}">
         <div class="product-media">
-          <img src="${imgSrc(p.img, 800)}" srcset="${imgSrcset(p.img, [240, 480, 800, 1100])}"
+          <img data-media src="${imgSrc(p.img, 800)}" srcset="${imgSrcset(p.img, [240, 480, 800, 1100])}"
                sizes="(min-width: 960px) 33vw, (min-width: 640px) 50vw, 120px"
                alt="${esc(p.alt)}" width="800" height="680" loading="lazy" decoding="async">
           ${p.badge ? `<span class="product-badge">${esc(p.badge)}</span>` : ""}
@@ -190,6 +224,7 @@
     const opt = e.target.closest(".opt");
     if (opt) {
       $$(".opt", root).forEach((o) => o.setAttribute("aria-checked", String(o === opt)));
+      updateMedia(root);
       return false;
     }
     const q = e.target.closest("[data-qty]");
@@ -269,6 +304,9 @@
       }
       handleConfigClick(e, card);
     });
+    grid.addEventListener("change", (e) => {
+      if (e.target.matches("[data-topping]")) updateMedia(e.target.closest(".product"));
+    });
   }
 
   /* ---------- Ficha de producto (celular) ---------- */
@@ -284,6 +322,9 @@
       this.el.addEventListener("click", (e) => {
         const root = e.target.closest(".sheet-product");
         if (root && handleConfigClick(e, root)) this.closeTimer = setTimeout(() => this.close(), 700);
+      });
+      this.el.addEventListener("change", (e) => {
+        if (e.target.matches("[data-topping]")) updateMedia(e.target.closest(".sheet-product"));
       });
       document.addEventListener("keydown", (e) => {
         if (!this.isOpen()) return;
@@ -301,7 +342,7 @@
       $("#sheet-body").innerHTML = `
         <div class="sheet-product" data-id="${p.id}">
           <div class="sheet-media">
-            <img src="${imgSrc(p.img, 800)}" srcset="${imgSrcset(p.img, [480, 800])}" sizes="100vw"
+            <img data-media src="${imgSrc(p.img, 800)}" srcset="${imgSrcset(p.img, [480, 800])}" sizes="100vw"
                  alt="${esc(p.alt)}" width="800" height="600" decoding="async">
             ${p.badge ? `<span class="product-badge">${esc(p.badge)}</span>` : ""}
           </div>
@@ -440,7 +481,7 @@
         : `<span class="cart-item-price tbc">Precio a confirmar</span>`;
       return `
         <li class="cart-item" data-key="${esc(i.key)}">
-          <img src="${imgSrc(r.product.img, 160)}" alt="" width="72" height="72" loading="lazy">
+          <img src="${imgSrc(variantImage(r.product, i.optionId, i.topping).src, 160)}" alt="" width="72" height="72" loading="lazy">
           <div>
             <h3>${esc(r.product.name)}</h3>
             <p class="cart-item-meta">${esc(lineLabel(r)) || "&nbsp;"}</p>

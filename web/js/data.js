@@ -67,13 +67,29 @@ window.LANTANA = {
       name: "Cheesecake New York",
       category: "cheesecakes",
       description: "Cremoso, elegante y perfectamente equilibrado. Un clásico que nunca falla.",
-      img: unsplash("1524351199678-941a58a3df50"),
-      alt: "Porción de cheesecake New York cremoso en plato",
+      img: "assets/fotos/menu/ny-porcion-sin-topping.jpg",
+      alt: "Porción de cheesecake New York clásico de Lantana, sin topping",
       options: [
         { id: "porcion", label: "Porción", price: 35 },
         { id: "entero", label: "Entero", price: 300 },
       ],
       toppings: true,
+      // Foto según presentación y topping elegidos. "sin-topping" = sin topping.
+      // Si un topping no tiene foto, se muestra la de "sin-topping" de esa presentación.
+      variants: {
+        porcion: {
+          "sin-topping": "assets/fotos/menu/ny-porcion-sin-topping.jpg",
+          "frutos-del-bosque": "assets/fotos/menu/ny-porcion-frutos-del-bosque.jpg",
+          frutilla: "assets/fotos/menu/ny-porcion-frutilla.jpg",
+          maracuya: "assets/fotos/menu/ny-porcion-maracuya.jpg",
+        },
+        entero: {
+          "sin-topping": "assets/fotos/menu/ny-entero-sin-topping.jpg",
+          "frutos-del-bosque": "assets/fotos/menu/ny-entero-frutos-del-bosque.jpg",
+          frutilla: "assets/fotos/menu/ny-entero-frutilla.jpg",
+          maracuya: "assets/fotos/menu/ny-entero-maracuya.jpg",
+        },
+      },
       cta: "Pedir por WhatsApp",
     },
     {
