@@ -58,21 +58,23 @@ window.LANTANA = {
       badge: "Ideal para regalar",
       description: "Todo el sabor de Lantana en formato individual. Perfectos para compartir, regalar, reuniones o celebraciones.",
       story: "Pequeños en tamaño, enormes en sabor: la misma cremosidad de nuestros cheesecakes en una porción perfecta para una persona. Una cajita que convierte cualquier día en una ocasión especial.",
-      note: "Consulta nuestras presentaciones y disponibilidad.",
       img: "assets/fotos/menu/mini-sin-topping.jpg",
       alt: "Mini cheesecake New York individual de Lantana, sin topping",
-      options: [{ id: "caja", label: "Presentación a elegir", price: null }],
+      options: [
+        { id: "unidad", label: "Unidad", price: 30 },
+        { id: "pack6", label: "Pack x6", price: 150 },
+      ],
       toppings: true,
       variants: {
-        caja: {
+        unidad: {
           "sin-topping": "assets/fotos/menu/mini-sin-topping.jpg",
           "frutos-del-bosque": "assets/fotos/menu/mini-frutos-del-bosque.jpg",
           frutilla: "assets/fotos/menu/mini-frutilla.jpg",
           maracuya: "assets/fotos/menu/mini-maracuya.jpg",
         },
+        pack6: { "sin-topping": "assets/fotos/menu/mini-pack6-sin-topping.jpg" },
       },
-      cta: "Consultar mini cheesecakes",
-      message: "Hola Lantana Café Bistró. Quisiera información sobre los mini cheesecakes.",
+      cta: "Pedir por WhatsApp",
     },
     {
       id: "cheesecake-new-york",
