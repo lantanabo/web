@@ -55,7 +55,7 @@ window.LANTANA = {
       featured: true,
       name: "Mini Cheesecakes",
       category: "cheesecakes",
-      badge: "Ideal para regalar",
+      badge: "Lo más vendido",
       description: "Todo el sabor de Lantana en formato individual. Perfectos para compartir, regalar, reuniones o celebraciones.",
       story: "Pequeños en tamaño, enormes en sabor: la misma cremosidad de nuestros cheesecakes en una porción perfecta para una persona. Una cajita que convierte cualquier día en una ocasión especial.",
       img: "assets/fotos/menu/mini-pack6-frutos-del-bosque.jpg",
@@ -154,6 +154,8 @@ window.LANTANA = {
     },
     {
       id: "torta-bruce-bruce",
+      // Temporal: se muestra como "No disponible" y no se puede pedir. Para volver a venderlo, borra esta línea.
+      unavailable: true,
       featured: true,
       name: "Torta Bruce Bruce",
       category: "tortas",
