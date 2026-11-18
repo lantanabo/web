@@ -157,15 +157,9 @@
   function updateMedia(root) {
     const c = carouselOf(root);
     if (c) {
-      // Con carrusel: llevamos la foto a la presentación elegida (mismo sabor que se veía) y dejamos de rotar.
-      // El topping elegido en la lista NO cambia la foto.
-      const sel = $(".opt[aria-checked='true']", root);
-      const opt = sel ? sel.dataset.opt : defaultOpt(c.p);
-      const shown = c.slides[c.index];
-      let i = c.slides.findIndex((s) => s.option === opt && shown && s.topping === shown.topping);
-      if (i < 0) i = c.slides.findIndex((s) => s.option === opt);
+      // Con carrusel: los botones de presentación y el topping NO cambian la foto;
+      // solo hacemos una pausa breve en la rotación.
       holdCarousel(c);
-      if (i >= 0) carouselGo(c, i, { smooth: true, apply: false });
       return;
     }
     const p = D.products.find((x) => x.id === root.dataset.id);
