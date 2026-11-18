@@ -496,7 +496,12 @@
       if (!a) return;
       e.preventDefault();
       setActive(a.dataset.cat);
-      $(`#cat-${a.dataset.cat}`).scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+      // Dejamos el título de la categoría justo debajo del encabezado y las pestañas fijas
+      // (scrollIntoView sumaba dos márgenes y se veía el último producto de la categoría anterior)
+      const headerH = $(".site-header, header")?.offsetHeight || 0;
+      const navBar = nav.closest(".cat-nav") || nav;
+      const top = $(`#cat-${a.dataset.cat}`).getBoundingClientRect().top + window.scrollY - headerH - navBar.offsetHeight - 12;
+      window.scrollTo({ top, behavior: reduceMotion ? "auto" : "smooth" });
     });
     const io = new IntersectionObserver((entries) => {
       entries.forEach((en) => { if (en.isIntersecting) setActive(en.target.id.slice(4)); });
