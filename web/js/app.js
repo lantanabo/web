@@ -254,6 +254,9 @@
       c.settleTimer = setTimeout(() => carouselSettle(c), 110);
     }, { passive: true });
     if (autoplay) {
+      // Pausa solo con el mouse encima (en celular el toque no debe dejarlo pausado)
+      root.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") c.paused = true; });
+      root.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") c.paused = false; });
       carouselIO.observe(track);
       carousels.push(c);
     }
