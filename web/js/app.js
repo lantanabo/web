@@ -122,7 +122,6 @@
 
   /* ---------- Catálogo ---------- */
   function priceLabel(p) {
-    if (p.unavailable) return `<span class="product-price tbc">No disponible</span>`;
     if (p.comingSoon) return `<span class="product-price tbc">Muy pronto</span>`;
     const prices = p.options.map((o) => o.price).filter((n) => n != null);
     if (!prices.length) return `<span class="product-price tbc">Precio a confirmar</span>`;
@@ -182,8 +181,14 @@
   function productConfig(p, prefix) {
     const story = p.story ? `<p class="product-story">${esc(p.story)}</p>` : "";
     // Producto temporalmente no disponible: se ve en el menú pero no se puede pedir
+    // Se muestran sus precios (porción / entero) solo como referencia
     if (p.unavailable) {
-      return `${story}<p class="soon-note">No disponible por el momento.</p>`;
+      const ref = p.options.some((o) => o.price != null)
+        ? `<ul class="price-ref" aria-label="Precios de ${esc(p.name)}">
+            ${p.options.map((o) => `<li><span>${esc(o.label)}</span><small>${o.price != null ? money(o.price) : "A consultar"}</small></li>`).join("")}
+          </ul>`
+        : "";
+      return `${story}${ref}<p class="soon-note">No disponible por el momento.</p>`;
     }
     if (p.comingSoon) {
       return `${story}<p class="soon-note">Muy pronto disponible para pedir. ¡Estamos preparando algo delicioso!</p>`;
