@@ -164,7 +164,7 @@
       const shown = c.slides[c.index];
       let i = c.slides.findIndex((s) => s.option === opt && shown && s.topping === shown.topping);
       if (i < 0) i = c.slides.findIndex((s) => s.option === opt);
-      c.stopped = true;
+      holdCarousel(c);
       if (i >= 0) carouselGo(c, i, { smooth: true, apply: false });
       return;
     }
@@ -190,7 +190,8 @@
   /* ---------- Carrusel de fotos por producto ----------
      Cada foto de `variants` (presentación × topping) es una diapositiva.
      Avanza sola cada 3 s de derecha a izquierda y se puede deslizar con el dedo;
-     la presentación y el topping elegidos siguen a la foto que se ve. */
+     al deslizar a mano se marca la presentación de esa foto. Tras tocarlo, sigue rotando
+     a los pocos segundos (la rotación automática no cambia lo que eligió el cliente). */
   const SLIDE_MS = 3000;
 
   /** Diapositivas del producto, empezando por la foto con la que abre. */
@@ -235,6 +236,13 @@
   }
 
   const carousels = [];
+  const RESUME_MS = 3000; // tras tocar o deslizar, la rotación sigue después de esta pausa
+
+  /** El cliente tocó el carrusel o eligió algo: pausa breve y luego sigue rotando.
+   *  La rotación automática solo cambia la foto, nunca la presentación ni el topping elegidos. */
+  function holdCarousel(c) {
+    c.holdUntil = Date.now() + RESUME_MS;
+  }
   const carouselOf = (root) => $("[data-track]", root)?._carousel || null;
 
   function setupCarousel(root, autoplay) {
@@ -243,7 +251,7 @@
     const p = D.products.find((x) => x.id === root.dataset.id);
     const c = {
       root, track, p, slides: slidesFor(p), index: 0,
-      stopped: !autoplay || reduceMotion, paused: false, visible: false,
+      stopped: !autoplay || reduceMotion, paused: false, visible: false, holdUntil: 0,
       programmatic: false, applyOnSettle: false, settleTimer: 0,
     };
     track._carousel = c;
@@ -288,7 +296,7 @@
     const apply = byUser || c.applyOnSettle;
     c.programmatic = false;
     c.applyOnSettle = false;
-    if (byUser) c.stopped = true; // el cliente está mirando: no le cambiamos la foto
+    if (byUser) holdCarousel(c); // el cliente está mirando: esperamos un poco antes de seguir
     c.index = i;
     if (apply) carouselApply(c);
     carouselDots(c);
@@ -307,7 +315,7 @@
   /** Al elegir topping: la foto no cambia, solo deja de rotar para no mover la presentación elegida. */
   function stopCarousel(root) {
     const c = carouselOf(root);
-    if (c) c.stopped = true;
+    if (c) holdCarousel(c);
   }
 
   function carouselDots(c) {
@@ -326,9 +334,9 @@
     if (document.hidden) return;
     let k = 0;
     carousels.forEach((c) => {
-      if (c.stopped || c.paused || !c.visible) return;
+      if (c.stopped || c.paused || !c.visible || Date.now() < c.holdUntil) return;
       // Pequeño desfase entre cards para que no cambien todas a la vez
-      setTimeout(() => { if (!c.stopped && !c.paused) carouselGo(c, c.index + 1, { smooth: true, apply: true }); }, k++ * 280);
+      setTimeout(() => { if (!c.stopped && !c.paused && Date.now() >= c.holdUntil) carouselGo(c, c.index + 1, { smooth: true, apply: false }); }, k++ * 280);
     });
   }, SLIDE_MS);
 
@@ -412,7 +420,7 @@
     const dot = e.target.closest("[data-dot]");
     if (dot) {
       const c = carouselOf(root);
-      if (c) { c.stopped = true; carouselGo(c, Number(dot.dataset.dot), { smooth: true, apply: true }); }
+      if (c) { holdCarousel(c); carouselGo(c, Number(dot.dataset.dot), { smooth: true, apply: true }); }
       return false;
     }
     const opt = e.target.closest(".opt");
