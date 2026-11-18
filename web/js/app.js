@@ -230,12 +230,11 @@
   }
 
   const carousels = [];
-  const RESUME_MS = 3000; // tras tocar o deslizar, la rotación sigue después de esta pausa
 
   /** El cliente tocó el carrusel o eligió algo: pausa breve y luego sigue rotando.
    *  La rotación automática solo cambia la foto, nunca la presentación ni el topping elegidos. */
   function holdCarousel(c) {
-    c.holdUntil = Date.now() + RESUME_MS;
+    c.nextAt = Date.now() + SLIDE_MS; // vuelve a contar 3 s desde el último cambio manual
   }
   const carouselOf = (root) => $("[data-track]", root)?._carousel || null;
 
@@ -245,11 +244,13 @@
     const p = D.products.find((x) => x.id === root.dataset.id);
     const c = {
       root, track, p, slides: slidesFor(p), index: 0,
-      stopped: !autoplay || reduceMotion, paused: false, visible: false, holdUntil: 0,
+      stopped: !autoplay || reduceMotion, paused: false, visible: false,
+      nextAt: Date.now() + SLIDE_MS + carousels.length * 280, // desfase para que no cambien todas a la vez
       programmatic: false, applyOnSettle: false, settleTimer: 0,
     };
     track._carousel = c;
     track.addEventListener("scroll", () => {
+      if (!c.programmatic) holdCarousel(c); // mientras el cliente desliza, no avanzamos
       clearTimeout(c.settleTimer);
       c.settleTimer = setTimeout(() => carouselSettle(c), 110);
     }, { passive: true });
@@ -325,19 +326,25 @@
     entries.forEach((en) => { en.target._carousel.visible = en.isIntersecting; });
   }, { threshold: 0.5 });
 
+  // Cada carrusel avanza 3 s después de su último cambio (automático o manual)
   setInterval(() => {
-    if (document.hidden) return;
     // Quitamos los carruseles de fichas ya cerradas o reemplazadas
     for (let j = carousels.length - 1; j >= 0; j--) {
       if (!carousels[j].track.isConnected) { carouselIO.unobserve(carousels[j].track); carousels.splice(j, 1); }
     }
-    let k = 0;
+    const now = Date.now();
     carousels.forEach((c) => {
-      if (c.stopped || c.paused || !c.visible || Date.now() < c.holdUntil) return;
-      // Pequeño desfase entre cards para que no cambien todas a la vez
-      setTimeout(() => { if (!c.stopped && !c.paused && Date.now() >= c.holdUntil) carouselGo(c, c.index + 1, { smooth: true, apply: false }); }, k++ * 280);
+      if (c.stopped) return;
+      if (document.hidden || c.paused || !c.visible) {
+        // En pausa (cursor encima, fuera de pantalla): al volver espera 3 s completos
+        c.nextAt = Math.max(c.nextAt, now + SLIDE_MS);
+        return;
+      }
+      if (now < c.nextAt) return;
+      c.nextAt = now + SLIDE_MS;
+      carouselGo(c, c.index + 1, { smooth: true, apply: false });
     });
-  }, SLIDE_MS);
+  }, 200);
 
   // En celular el menú se muestra en filas compactas y el detalle se elige en una ficha
   const compactMQ = window.matchMedia("(max-width: 639px)");
