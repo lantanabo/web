@@ -541,8 +541,52 @@
         if (e.key === "Tab") Drawer.trap.call({ el: this.el }, e);
       });
       compactMQ.addEventListener("change", () => { if (this.isOpen()) this.close(); });
+      this.initDrag();
     },
     isOpen() { return this.el.classList.contains("open"); },
+
+    /** Deslizar hacia abajo cierra la ficha (si está arriba del todo). */
+    initDrag() {
+      const el = this.el;
+      let startY = 0, startX = 0, startT = 0, dy = 0, mode = null; // mode: null | "drag" | "ignore"
+      el.addEventListener("touchstart", (e) => {
+        if (e.touches.length !== 1 || e.target.closest("select, input, textarea")) { mode = "ignore"; return; }
+        startY = e.touches[0].clientY;
+        startX = e.touches[0].clientX;
+        startT = Date.now();
+        dy = 0;
+        mode = null;
+      }, { passive: true });
+      el.addEventListener("touchmove", (e) => {
+        if (mode === "ignore") return;
+        const y = e.touches[0].clientY - startY;
+        const x = e.touches[0].clientX - startX;
+        if (mode === null) {
+          if (Math.abs(x) < 6 && Math.abs(y) < 6) return;
+          // Solo arrastramos si el gesto es hacia abajo, vertical y con la ficha arriba del todo
+          mode = y > 0 && Math.abs(y) > Math.abs(x) && el.scrollTop <= 0 ? "drag" : "ignore";
+          if (mode === "ignore") return;
+          el.style.transition = "none";
+          this.backdrop.style.transition = "none";
+        }
+        e.preventDefault();
+        dy = Math.max(0, y);
+        el.style.transform = `translateY(${dy}px)`;
+        this.backdrop.style.opacity = String(Math.max(0, 1 - dy / el.offsetHeight));
+      }, { passive: false });
+      const end = () => {
+        if (mode !== "drag") { mode = null; return; }
+        mode = null;
+        const fast = dy / Math.max(1, Date.now() - startT) > 0.5;
+        el.style.transition = "";
+        el.style.transform = "";
+        this.backdrop.style.transition = "";
+        this.backdrop.style.opacity = "";
+        if (dy > 110 || (fast && dy > 30)) this.close();
+      };
+      el.addEventListener("touchend", end);
+      el.addEventListener("touchcancel", end);
+    },
 
     open(id, from) {
       const p = D.products.find((x) => x.id === id);
