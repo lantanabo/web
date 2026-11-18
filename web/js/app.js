@@ -249,6 +249,21 @@
       programmatic: false, applyOnSettle: false, settleTimer: 0,
     };
     track._carousel = c;
+    // PC (touchpad / rueda horizontal): un gesto = una foto. Sin esto, la inercia del touchpad
+    // pasaba varias fotos de golpe. El gesto termina cuando dejan de llegar eventos por 250 ms.
+    let wheelLock = false, wheelEnd = 0;
+    track.addEventListener("wheel", (e) => {
+      const dx = e.deltaX || (e.shiftKey ? e.deltaY : 0);
+      if (Math.abs(dx) <= Math.abs(e.shiftKey ? 0 : e.deltaY)) return; // gesto vertical: deja bajar la página
+      e.preventDefault();
+      clearTimeout(wheelEnd);
+      wheelEnd = setTimeout(() => (wheelLock = false), 250);
+      if (wheelLock || Math.abs(dx) < 4) return;
+      wheelLock = true;
+      holdCarousel(c);
+      const n = c.slides.length;
+      carouselGo(c, dx > 0 ? c.index + 1 : (c.index - 1 + n) % n, { smooth: true, apply: true });
+    }, { passive: false });
     track.addEventListener("scroll", () => {
       if (!c.programmatic) holdCarousel(c); // mientras el cliente desliza, no avanzamos
       clearTimeout(c.settleTimer);
