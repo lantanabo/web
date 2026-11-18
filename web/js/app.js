@@ -260,8 +260,9 @@
       c.settleTimer = setTimeout(() => carouselSettle(c), 110);
     }, { passive: true });
     if (autoplay) {
-      root.addEventListener("mouseenter", () => (c.paused = true));
-      root.addEventListener("mouseleave", () => (c.paused = false));
+      // Pausa solo con el mouse encima (en celular el toque no debe dejarlo pausado)
+      root.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") c.paused = true; });
+      root.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") c.paused = false; });
       carouselIO.observe(track);
       carousels.push(c);
     }
@@ -332,6 +333,10 @@
 
   setInterval(() => {
     if (document.hidden) return;
+    // Quitamos los carruseles de fichas ya cerradas o reemplazadas
+    for (let j = carousels.length - 1; j >= 0; j--) {
+      if (!carousels[j].track.isConnected) { carouselIO.unobserve(carousels[j].track); carousels.splice(j, 1); }
+    }
     let k = 0;
     carousels.forEach((c) => {
       if (c.stopped || c.paused || !c.visible || Date.now() < c.holdUntil) return;
@@ -560,7 +565,7 @@
           </div>
         </div>`;
       // La ficha abre en la misma foto (y elección) que se veía en el menú
-      const c = setupCarousel($(".sheet-product", this.el), false);
+      const c = setupCarousel($(".sheet-product", this.el), true);
       if (c && from) {
         c.index = from.index;
         carouselApply(c);
