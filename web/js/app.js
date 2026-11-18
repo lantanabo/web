@@ -155,6 +155,19 @@
 
   /** Cambia la foto de una card o ficha para reflejar lo que el cliente eligió. */
   function updateMedia(root) {
+    const c = carouselOf(root);
+    if (c) {
+      // Con carrusel: llevamos la foto a la presentación elegida (mismo sabor que se veía) y dejamos de rotar.
+      // El topping elegido en la lista NO cambia la foto.
+      const sel = $(".opt[aria-checked='true']", root);
+      const opt = sel ? sel.dataset.opt : defaultOpt(c.p);
+      const shown = c.slides[c.index];
+      let i = c.slides.findIndex((s) => s.option === opt && shown && s.topping === shown.topping);
+      if (i < 0) i = c.slides.findIndex((s) => s.option === opt);
+      c.stopped = true;
+      if (i >= 0) carouselGo(c, i, { smooth: true, apply: false });
+      return;
+    }
     const p = D.products.find((x) => x.id === root.dataset.id);
     const img = $("[data-media]", root);
     if (!p || !p.variants || !img) return;
@@ -173,6 +186,151 @@
     };
     pre.src = target;
   }
+
+  /* ---------- Carrusel de fotos por producto ----------
+     Cada foto de `variants` (presentación × topping) es una diapositiva.
+     Avanza sola cada 3 s de derecha a izquierda y se puede deslizar con el dedo;
+     la presentación y el topping elegidos siguen a la foto que se ve. */
+  const SLIDE_MS = 3000;
+
+  /** Diapositivas del producto, empezando por la foto con la que abre. */
+  function slidesFor(p) {
+    if (!p.variants) return [];
+    // Primero todos los sabores de la presentación inicial (empezando por su topping), luego las demás
+    const rotate = (arr, first) => { const k = Math.max(0, arr.indexOf(first)); return arr.slice(k).concat(arr.slice(0, k)); };
+    const keys = rotate(["sin-topping", ...D.toppings.map((t) => t.id)], p.toppings && p.defaultTopping ? p.defaultTopping : "sin-topping");
+    const options = rotate(p.options, p.options.find((o) => o.id === defaultOpt(p)));
+    const out = [];
+    const seen = new Set();
+    options.forEach((o) => {
+      const set = p.variants[o.id];
+      if (!set) return;
+      keys.forEach((key) => {
+        const src = set[key];
+        if (!src || seen.has(src)) return;
+        seen.add(src);
+        const topping = key === "sin-topping" ? "" : key;
+        out.push({ option: o.id, topping, src, alt: variantImage(p, o.id, topping).alt });
+      });
+    });
+    return out;
+  }
+
+  /** HTML de la foto: carrusel si hay varias, o una sola imagen. */
+  function mediaHTML(p, { sizes, widths, width, height, lazy }) {
+    const slides = slidesFor(p);
+    if (slides.length < 2) {
+      const media = initialImage(p);
+      return `<img data-media src="${imgSrc(media.src, 800)}" srcset="${imgSrcset(media.src, widths)}" sizes="${sizes}"
+               alt="${esc(media.alt)}" width="${width}" height="${height}"${lazy ? ' loading="lazy"' : ""} decoding="async">`;
+    }
+    const img = (s, i, clone) => `<img src="${imgSrc(s.src, 800)}" srcset="${imgSrcset(s.src, widths)}" sizes="${sizes}"
+               alt="${clone ? "" : esc(s.alt)}"${clone ? ' aria-hidden="true"' : ""} width="${width}" height="${height}"
+               loading="${i === 0 && !lazy ? "eager" : "lazy"}" decoding="async">`;
+    // La copia de la primera foto al final permite que el ciclo siga siempre hacia la izquierda
+    return `
+      <div class="media-track" data-track>${slides.map((s, i) => img(s, i)).join("")}${img(slides[0], 1, true)}</div>
+      <div class="media-dots">${slides.map((s, i) =>
+        `<button type="button" data-dot="${i}" aria-label="Ver foto ${i + 1} de ${slides.length}"${i === 0 ? ' aria-current="true"' : ""}></button>`).join("")}</div>`;
+  }
+
+  const carousels = [];
+  const carouselOf = (root) => $("[data-track]", root)?._carousel || null;
+
+  function setupCarousel(root, autoplay) {
+    const track = $("[data-track]", root);
+    if (!track) return null;
+    const p = D.products.find((x) => x.id === root.dataset.id);
+    const c = {
+      root, track, p, slides: slidesFor(p), index: 0,
+      stopped: !autoplay || reduceMotion, paused: false, visible: false,
+      programmatic: false, applyOnSettle: false, settleTimer: 0,
+    };
+    track._carousel = c;
+    track.addEventListener("scroll", () => {
+      clearTimeout(c.settleTimer);
+      c.settleTimer = setTimeout(() => carouselSettle(c), 110);
+    }, { passive: true });
+    if (autoplay) {
+      root.addEventListener("mouseenter", () => (c.paused = true));
+      root.addEventListener("mouseleave", () => (c.paused = false));
+      carouselIO.observe(track);
+      carousels.push(c);
+    }
+    return c;
+  }
+
+  function carouselGo(c, i, { smooth, apply }) {
+    const left = i * c.track.clientWidth;
+    if (Math.abs(c.track.scrollLeft - left) < 1) {
+      c.index = i;
+      if (apply) carouselApply(c);
+      carouselDots(c);
+      return;
+    }
+    c.programmatic = true;
+    c.applyOnSettle = apply;
+    c.track.scrollTo({ left, behavior: smooth && !reduceMotion ? "smooth" : "instant" });
+  }
+
+  /** Al terminar de moverse: fija la foto actual y, si hace falta, la elección. */
+  function carouselSettle(c) {
+    const w = c.track.clientWidth;
+    if (!w) return;
+    let i = Math.round(c.track.scrollLeft / w);
+    if (i >= c.slides.length) {
+      // Llegamos a la copia de la primera foto: saltamos a la original sin animación
+      c.programmatic = true;
+      c.track.scrollTo({ left: 0, behavior: "instant" });
+      i = 0;
+    }
+    const byUser = !c.programmatic;
+    const apply = byUser || c.applyOnSettle;
+    c.programmatic = false;
+    c.applyOnSettle = false;
+    if (byUser) c.stopped = true; // el cliente está mirando: no le cambiamos la foto
+    c.index = i;
+    if (apply) carouselApply(c);
+    carouselDots(c);
+  }
+
+  /** Marca en la card/ficha la presentación de la foto visible (el topping lo elige solo el cliente). */
+  function carouselApply(c) {
+    const s = c.slides[c.index];
+    if (!s) return;
+    const opts = $$(".opt", c.root);
+    if (opts.some((o) => o.dataset.opt === s.option)) {
+      opts.forEach((o) => o.setAttribute("aria-checked", String(o.dataset.opt === s.option)));
+    }
+  }
+
+  /** Al elegir topping: la foto no cambia, solo deja de rotar para no mover la presentación elegida. */
+  function stopCarousel(root) {
+    const c = carouselOf(root);
+    if (c) c.stopped = true;
+  }
+
+  function carouselDots(c) {
+    $$("[data-dot]", c.root).forEach((d) =>
+      d.dataset.dot === String(c.index) ? d.setAttribute("aria-current", "true") : d.removeAttribute("aria-current"));
+    // Deja lista la siguiente foto para que no aparezca en blanco
+    const next = c.track.children[c.index + 1];
+    if (next) next.loading = "eager";
+  }
+
+  const carouselIO = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { en.target._carousel.visible = en.isIntersecting; });
+  }, { threshold: 0.5 });
+
+  setInterval(() => {
+    if (document.hidden) return;
+    let k = 0;
+    carousels.forEach((c) => {
+      if (c.stopped || c.paused || !c.visible) return;
+      // Pequeño desfase entre cards para que no cambien todas a la vez
+      setTimeout(() => { if (!c.stopped && !c.paused) carouselGo(c, c.index + 1, { smooth: true, apply: true }); }, k++ * 280);
+    });
+  }, SLIDE_MS);
 
   // En celular el menú se muestra en filas compactas y el detalle se elige en una ficha
   const compactMQ = window.matchMedia("(max-width: 639px)");
@@ -230,13 +388,10 @@
   }
 
   function productCard(p) {
-    const media = initialImage(p);
     return `
       <article class="product${p.comingSoon || p.unavailable ? " is-soon" : ""}" data-id="${p.id}" data-category="${p.category}">
         <div class="product-media">
-          <img data-media src="${imgSrc(media.src, 800)}" srcset="${imgSrcset(media.src, [240, 480, 800, 1100])}"
-               sizes="(min-width: 960px) 33vw, (min-width: 640px) 50vw, 120px"
-               alt="${esc(media.alt)}" width="800" height="680" loading="lazy" decoding="async">
+          ${mediaHTML(p, { sizes: "(min-width: 960px) 33vw, (min-width: 640px) 50vw, 120px", widths: [240, 480, 800, 1100], width: 800, height: 680, lazy: true })}
           ${badge(p)}
         </div>
         <div class="product-body">
@@ -254,6 +409,12 @@
 
   /** Clics dentro de una card o de la ficha. Devuelve true si se agregó al pedido. */
   function handleConfigClick(e, root) {
+    const dot = e.target.closest("[data-dot]");
+    if (dot) {
+      const c = carouselOf(root);
+      if (c) { c.stopped = true; carouselGo(c, Number(dot.dataset.dot), { smooth: true, apply: true }); }
+      return false;
+    }
     const opt = e.target.closest(".opt");
     if (opt) {
       $$(".opt", root).forEach((o) => o.setAttribute("aria-checked", String(o === opt)));
@@ -301,6 +462,8 @@
         </section>`;
     }).join("");
 
+    $$(".product", grid).forEach((card) => setupCarousel(card, true));
+
     // Pestañas: llevan a cada categoría y se marcan solas al deslizar
     const nav = $("#filters");
     nav.innerHTML = cats.map((c, i) =>
@@ -332,13 +495,13 @@
       if (compactMQ.matches) {
         // Fila compacta: abre la ficha del producto
         e.preventDefault();
-        Sheet.open(card.dataset.id);
+        Sheet.open(card.dataset.id, carouselOf(card));
         return;
       }
       handleConfigClick(e, card);
     });
     grid.addEventListener("change", (e) => {
-      if (e.target.matches("[data-topping]")) updateMedia(e.target.closest(".product"));
+      if (e.target.matches("[data-topping]")) stopCarousel(e.target.closest(".product"));
     });
   }
 
@@ -357,7 +520,7 @@
         if (root && handleConfigClick(e, root)) this.closeTimer = setTimeout(() => this.close(), 700);
       });
       this.el.addEventListener("change", (e) => {
-        if (e.target.matches("[data-topping]")) updateMedia(e.target.closest(".sheet-product"));
+        if (e.target.matches("[data-topping]")) stopCarousel(e.target.closest(".sheet-product"));
       });
       document.addEventListener("keydown", (e) => {
         if (!this.isOpen()) return;
@@ -368,16 +531,14 @@
     },
     isOpen() { return this.el.classList.contains("open"); },
 
-    open(id) {
+    open(id, from) {
       const p = D.products.find((x) => x.id === id);
       if (!p) return;
       clearTimeout(this.closeTimer);
-      const media = initialImage(p);
       $("#sheet-body").innerHTML = `
         <div class="sheet-product" data-id="${p.id}">
           <div class="sheet-media">
-            <img data-media src="${imgSrc(media.src, 800)}" srcset="${imgSrcset(media.src, [480, 800])}" sizes="100vw"
-                 alt="${esc(media.alt)}" width="800" height="600" decoding="async">
+            ${mediaHTML(p, { sizes: "100vw", widths: [480, 800], width: 800, height: 600, lazy: false })}
             ${badge(p)}
           </div>
           <div class="sheet-content">
@@ -390,6 +551,14 @@
             ${productConfig(p, "sheet")}
           </div>
         </div>`;
+      // La ficha abre en la misma foto (y elección) que se veía en el menú
+      const c = setupCarousel($(".sheet-product", this.el), false);
+      if (c && from) {
+        c.index = from.index;
+        carouselApply(c);
+        carouselDots(c);
+        requestAnimationFrame(() => carouselGo(c, from.index, { smooth: false, apply: true }));
+      }
       this.lastFocus = document.activeElement;
       this.el.scrollTop = 0;
       this.backdrop.hidden = false;
