@@ -12,7 +12,7 @@ web/
 ├── js/app.js           Carrito, pedido por WhatsApp, formulario, carrusel, animaciones
 ├── assets/brand/       Logos, símbolo, azulejos y patrón (desde BRANDING LANTANA, en WebP)
 ├── assets/fotos/       Fotos propias de Lantana
-├── assets/og-image.jpg Imagen al compartir el enlace en redes/WhatsApp
+├── assets/og-lantana.jpg Imagen al compartir el enlace (1200×630). Si la cambias, usa un nombre de archivo nuevo: WhatsApp/Facebook guardan la anterior
 ├── robots.txt, sitemap.xml
 ```
 
