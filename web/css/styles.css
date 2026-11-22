@@ -392,7 +392,7 @@ p { margin: 0 0 1em; }
 .topping-select { display: grid; gap: 0.35rem; }
 .topping-select label { font-size: 0.78rem; color: var(--muted); letter-spacing: 0.04em; }
 
-select, input[type="text"], input[type="tel"], input[type="date"], textarea {
+select, input[type="text"], input[type="tel"], input[type="date"], input[type="time"], textarea {
   width: 100%; min-height: 48px; padding: 0.7rem 0.95rem;
   border-radius: var(--radius-sm); border: 1px solid var(--linea-fuerte);
   background: var(--crema); color: var(--tinta); font-size: 1rem;

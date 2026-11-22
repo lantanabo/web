@@ -116,8 +116,7 @@ window.LANTANA = {
     },
     {
       id: "cheesecake-vasco",
-      // Temporal: se muestra como "No disponible" y no se puede pedir. Para volver a venderlo, borra esta línea.
-      unavailable: true,
+      // Para dejarlo como "No disponible" (visible pero sin poder pedirse), agrega aquí: unavailable: true,
       featured: true,
       name: "Cheesecake Vasco",
       category: "cheesecakes",
@@ -136,9 +135,7 @@ window.LANTANA = {
     {
       id: "cheesecake-oreo",
       featured: true,
-      // Temporal: se muestra en el menú como "Muy pronto" pero no se puede pedir.
-      // Para volver a venderlo, borra la línea de abajo (o ponla en false).
-      comingSoon: true,
+      // Para dejarlo como "No disponible" (visible pero sin poder pedirse), agrega aquí: unavailable: true,
       name: "Cheesecake Oreo",
       category: "cheesecakes",
       description: "La combinación perfecta entre la cremosidad del cheesecake y el sabor irresistible de Oreo.",
@@ -154,8 +151,7 @@ window.LANTANA = {
     },
     {
       id: "torta-bruce-bruce",
-      // Temporal: se muestra como "No disponible" y no se puede pedir. Para volver a venderlo, borra esta línea.
-      unavailable: true,
+      // Para dejarlo como "No disponible" (visible pero sin poder pedirse), agrega aquí: unavailable: true,
       featured: true,
       name: "Torta Bruce Bruce",
       category: "tortas",
@@ -176,8 +172,7 @@ window.LANTANA = {
     },
     {
       id: "brownie",
-      // Temporal: se muestra como "No disponible" y no se puede pedir. Para volver a venderlo, borra esta línea.
-      unavailable: true,
+      // Para dejarlo como "No disponible" (visible pero sin poder pedirse), agrega aquí: unavailable: true,
       name: "Brownie",
       category: "clasicos",
       description: "Intenso, húmedo y chocolatoso. Ideal para acompañar el café o simplemente darse un gusto.",

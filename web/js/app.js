@@ -903,7 +903,7 @@
     if (fd.get("direccion").trim()) out.push(`Dirección / referencia: ${fd.get("direccion").trim()}`);
     if (fd.get("ubicacion")) out.push(`Ubicación en el mapa: ${mapsLink(fd.get("ubicacion"))}`);
     out.push(`Fecha de entrega: ${fd.get("fecha") ? prettyDate(fd.get("fecha")) : "a coordinar"}`);
-    out.push(`Horario: ${fd.get("horario")}`);
+    out.push(`Hora de entrega: ${fd.get("horario") ? fd.get("horario") + " h" : "a coordinar"}`);
     if (fd.get("notas").trim()) out.push(`Notas: ${fd.get("notas").trim()}`);
     out.push("", "¿Me confirman disponibilidad y costo de delivery? ¡Gracias!");
     return out.join("\n");
