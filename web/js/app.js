@@ -852,6 +852,12 @@
       $("[data-step-label]").textContent = step === "items" ? "Paso 1 de 2" : step === "checkout" ? "Paso 2 de 2" : "¡Listo!";
       $("#cart-title").textContent = step === "items" ? "Tu pedido" : step === "checkout" ? "Datos de entrega" : "Pedido enviado";
       if (step === "checkout") {
+        // Fecha y hora de este momento por defecto (el cliente las puede cambiar)
+        const now = new Date();
+        const date = $("#co-date"), time = $("#co-time");
+        date.min = todayISO();
+        if (!date.value) date.value = todayISO();
+        if (!time.value) time.value = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
         updatePreview();
         setTimeout(() => $("#co-name").focus({ preventScroll: true }), 120);
       }
