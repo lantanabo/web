@@ -901,6 +901,7 @@
       `Zona de entrega: ${fd.get("zona")}`,
     ];
     if (fd.get("direccion").trim()) out.push(`Dirección / referencia: ${fd.get("direccion").trim()}`);
+    if (fd.get("ubicacion")) out.push(`Ubicación en el mapa: ${mapsLink(fd.get("ubicacion"))}`);
     out.push(`Fecha de entrega: ${fd.get("fecha") ? prettyDate(fd.get("fecha")) : "a coordinar"}`);
     out.push(`Horario: ${fd.get("horario")}`);
     if (fd.get("notas").trim()) out.push(`Notas: ${fd.get("notas").trim()}`);
@@ -926,6 +927,123 @@
   }
 
   let lastOrderText = "";
+
+  /* ---------- Ubicación de entrega (mapa con pin ajustable) ----------
+     El cliente toca "Usar mi ubicación actual": pedimos su GPS, rellenamos la
+     dirección (puede editarla) y mostramos un mapa para corregir el pin.
+     El pedido de WhatsApp lleva un enlace de Google Maps con el punto exacto.
+     Mapa: Leaflet + OpenStreetMap (gratis, se carga solo al usarlo). */
+  const mapsLink = (latlng) => `https://www.google.com/maps?q=${latlng}`;
+  const ZONA_NORTE = [-17.7520, -63.1830]; // centro aproximado si no hay GPS
+
+  let leafletReady = null;
+  function loadLeaflet() {
+    if (leafletReady) return leafletReady;
+    leafletReady = new Promise((resolve, reject) => {
+      const css = document.createElement("link");
+      css.rel = "stylesheet";
+      css.href = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css";
+      document.head.appendChild(css);
+      const js = document.createElement("script");
+      js.src = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js";
+      js.onload = () => resolve(window.L);
+      js.onerror = () => { leafletReady = null; reject(new Error("leaflet")); };
+      document.head.appendChild(js);
+    });
+    return leafletReady;
+  }
+
+  function initGeo() {
+    const btn = $("[data-geo]");
+    if (!btn) return;
+    const label = $("span", btn);
+    const box = $("#geo-box");
+    const hidden = $("#co-geo");
+    const address = $("#co-address");
+    const gmaps = $("#geo-gmaps");
+    let map = null, marker = null, lookupTimer = 0, autoText = "";
+
+    const busy = (on, text) => {
+      btn.disabled = on;
+      label.textContent = text || (hidden.value ? "Actualizar mi ubicación" : "Usar mi ubicación actual");
+    };
+
+    // Dirección legible a partir del punto (OpenStreetMap / Nominatim)
+    async function lookup(lat, lng) {
+      try {
+        const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=es`);
+        if (!r.ok) return;
+        const a = (await r.json()).address || {};
+        const street = [a.road || a.pedestrian || a.footway, a.house_number].filter(Boolean).join(" ");
+        const area = a.neighbourhood || a.suburb || a.quarter || a.residential || "";
+        const text = [street, area].filter(Boolean).join(", ");
+        // Solo rellenamos si el campo está vacío o tiene lo que pusimos nosotros (no pisamos lo que escribió)
+        if (text && (!address.value.trim() || address.value === autoText)) {
+          address.value = autoText = text;
+          updatePreview();
+        }
+      } catch (_) { /* sin dirección automática: el pin igual se envía */ }
+    }
+
+    function setPoint(lat, lng) {
+      hidden.value = `${lat.toFixed(6)},${lng.toFixed(6)}`;
+      gmaps.href = mapsLink(hidden.value);
+      clearTimeout(lookupTimer);
+      lookupTimer = setTimeout(() => lookup(lat, lng), 500);
+      updatePreview();
+    }
+
+    async function showMap(lat, lng, zoom) {
+      const L = await loadLeaflet();
+      box.hidden = false;
+      if (!map) {
+        map = L.map("geo-map", { zoomControl: true, attributionControl: true }).setView([lat, lng], zoom);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19, attribution: "© OpenStreetMap",
+        }).addTo(map);
+        const pin = L.divIcon({ className: "geo-pin", html: icon("pin"), iconSize: [36, 36], iconAnchor: [18, 34] });
+        marker = L.marker([lat, lng], { draggable: true, icon: pin, autoPan: true }).addTo(map);
+        marker.on("dragend", () => { const p = marker.getLatLng(); setPoint(p.lat, p.lng); });
+        map.on("click", (e) => { marker.setLatLng(e.latlng); setPoint(e.latlng.lat, e.latlng.lng); });
+      } else {
+        map.setView([lat, lng], zoom);
+        marker.setLatLng([lat, lng]);
+      }
+      setTimeout(() => map.invalidateSize(), 60);
+    }
+
+    btn.addEventListener("click", () => {
+      const manual = (msg) => {
+        // Sin GPS: abrimos el mapa en la Zona Norte para que marque su puerta a mano
+        toast(msg);
+        // (no enviamos ningún punto hasta que él toque el mapa o mueva el pin)
+        showMap(ZONA_NORTE[0], ZONA_NORTE[1], 14).then(() => busy(false)).catch(() => busy(false));
+      };
+      if (!navigator.geolocation) return manual("Marca tu ubicación tocando el mapa");
+      busy(true, "Buscando tu ubicación…");
+      loadLeaflet().catch(() => {}); // se descarga mientras llega el GPS
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude: lat, longitude: lng } = pos.coords;
+          showMap(lat, lng, 17).then(() => { setPoint(lat, lng); busy(false); })
+            .catch(() => { setPoint(lat, lng); busy(false); }); // sin mapa, igual enviamos el punto
+        },
+        (err) => manual(err.code === 1
+          ? "Permiso de ubicación denegado. Marca tu puerta tocando el mapa"
+          : "No pudimos obtener tu ubicación. Marca tu puerta tocando el mapa"),
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
+      );
+    });
+
+    $("[data-geo-clear]").addEventListener("click", () => {
+      hidden.value = "";
+      box.hidden = true;
+      if (address.value === autoText) address.value = "";
+      autoText = "";
+      busy(false);
+      updatePreview();
+    });
+  }
 
   function updatePreview() {
     if (Drawer.step !== "checkout" || !Cart.count()) return;
@@ -1188,6 +1306,7 @@
 
   /* ---------- Inicio ---------- */
   initCatalog();
+  initGeo();
   initToppings();
   wireLinks();
   initHeader();

@@ -32,7 +32,7 @@
   <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=Allura&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="assets/fotos/portada-maracuya.jpg" imagesrcset="assets/fotos/portada-maracuya-800.jpg 800w, assets/fotos/portada-maracuya.jpg 1400w" imagesizes="(min-width: 960px) 52vw, 100vw">
-  <link rel="stylesheet" href="css/styles.css?v=48">
+  <link rel="stylesheet" href="css/styles.css?v=49">
   <script>document.documentElement.classList.add("js")</script>
 
   <script type="application/ld+json">
@@ -515,6 +515,16 @@
       <div class="field">
         <label for="co-address">Dirección o referencia</label>
         <input id="co-address" name="direccion" type="text" autocomplete="street-address" placeholder="Barrio, calle, referencia (opcional)">
+        <button class="geo-btn" type="button" data-geo><svg class="icon" aria-hidden="true"><use href="#i-pin"/></svg> <span>Usar mi ubicación actual</span></button>
+        <div class="geo-box" id="geo-box" hidden>
+          <div class="geo-map" id="geo-map" aria-label="Mapa con tu ubicación de entrega"></div>
+          <p class="geo-hint">¿No es exacto? Arrastra el pin o toca el mapa en tu puerta.</p>
+          <div class="geo-actions">
+            <a class="link" id="geo-gmaps" href="#" target="_blank" rel="noopener">Ver en Google Maps</a>
+            <button class="link" type="button" data-geo-clear>Quitar ubicación</button>
+          </div>
+        </div>
+        <input type="hidden" name="ubicacion" id="co-geo">
       </div>
       <div class="field-row">
         <div class="field">
@@ -605,8 +615,8 @@
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
   </svg>
 
-  <script src="js/data.js?v=48"></script>
-  <script src="js/app.js?v=48" defer></script>
+  <script src="js/data.js?v=49"></script>
+  <script src="js/app.js?v=49" defer></script>
 
   <!-- Estadísticas de visitas (panel: https://lantanacafebistro.goatcounter.com/) -->
   <script data-goatcounter="https://lantanacafebistro.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>

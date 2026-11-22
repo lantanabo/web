@@ -576,6 +576,23 @@ select:focus, input:focus, textarea:focus { outline: none; border-color: var(--a
 .field { display: grid; gap: 0.4rem; }
 .field label, .field .label { font-size: 0.82rem; font-weight: 500; color: var(--azul); letter-spacing: 0.02em; }
 .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+/* Ubicación de entrega */
+.geo-btn {
+  display: inline-flex; align-items: center; gap: 0.45rem; justify-self: start;
+  padding: 0.5rem 0.9rem; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--azul); background: transparent; color: var(--azul);
+  font: inherit; font-size: 0.86rem; font-weight: 500;
+}
+.geo-btn .icon { width: 16px; height: 16px; }
+.geo-btn:disabled { opacity: 0.6; cursor: progress; }
+.geo-box { display: grid; gap: 0.4rem; }
+.geo-box[hidden] { display: none; }
+.geo-map { height: 200px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--linea); background: var(--crema-2); z-index: 0; }
+.geo-hint { margin: 0; font-size: 0.8rem; color: var(--muted); }
+.geo-actions { display: flex; justify-content: space-between; gap: 1rem; font-size: 0.85rem; }
+.geo-pin { background: none; border: 0; }
+.geo-pin .icon { width: 36px; height: 36px; fill: var(--azul); stroke: #fcfaf5; stroke-width: 1.4; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35)); }
+.geo-pin .icon circle { fill: #fcfaf5; stroke: none; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } }
 @keyframes bloom { from { opacity: 0; transform: scale(0.6) rotate(-30deg); } }
 
